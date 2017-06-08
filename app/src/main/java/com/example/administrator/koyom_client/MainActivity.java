@@ -24,13 +24,15 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
     Toolbar toolbar;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    FPAdapter fpAdapter;
+    Fragment fragment;
+    TextView test;
     TextView show;
-    Button btnClear;
-    TextView lblKikai, lblKokan;
-    EditText txtSagyo, txtKikai, txtKokan;
-
+    Button btnClear, btnUpd;
     EditText txtHoge;
-    Button btnUpd;
+
     Handler handler;
     // サーバと通信するスレッド
     ClientThread clientThread;
@@ -41,27 +43,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String sSagyoName = "";
     boolean focusFlg = false;
 
-    //入力チェック用配列
-    EditText arrEditText[];
-    TextView arrTextView[];
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViews();
 
+        test = (TextView) findViewById(R.id.test) ;
+
         // view取得
         show = (TextView) findViewById(R.id.show);
         btnClear = (Button) findViewById(R.id.btnClear);
-
-        lblKikai = (TextView) findViewById(R.id.lblKikai);
-        lblKokan = (TextView) findViewById(R.id.lblKokan);
-        txtSagyo = (EditText) findViewById((R.id.txtSagyo));
-        txtKikai = (EditText) findViewById(R.id.txtKikai);
-        txtKokan = (EditText) findViewById(R.id.txtKokan);
-        txtHoge = (EditText) findViewById(R.id.txtHoge);
         btnUpd = (Button) findViewById(R.id.btnUpd);
+        txtHoge = (EditText) findViewById(R.id.txtHoge);
 
         handler = new Handler()
         {
@@ -87,34 +81,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.nfcWriter = new NfcWriter(this);
 
         findViewById(R.id.btnClear).setOnClickListener(this);
-        findViewById(R.id.txtSagyo).setOnFocusChangeListener(this);
-        findViewById(R.id.txtKikai).setOnFocusChangeListener(this);
         findViewById(R.id.btnUpd).setOnClickListener(this);
 
-        //todo かんたんにできないものか
-        //入力チェック用配列にセット
-        arrEditText = new EditText[]{txtSagyo, txtKikai};
-        arrTextView = new TextView[]{null     , lblKikai};
+        //Fragment切替時の振る舞い
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            //スクロール状態が変化したときに呼び出される
+            public void onPageScrollStateChanged(int state) {
+                if(state == ViewPager.SCROLL_STATE_SETTLING) {
+                    int page = viewPager.getCurrentItem();
+                    show.append("" + page);
+			/* ここにしたい処理を書く。例えば、
+			textView.setText(String.valueOf(page));
+			という感じ */
+                }
+            }
+            @Override
+            //ページが切り替わった時に呼び出される
+            public void onPageSelected(int position) {
+                show.append("" + position);
+            }
+        });
 
-        //タップされてもキーボードを出さなくする
-        //todo Initでやる
-        txtSagyo.setKeyListener(null);
-        txtKikai.setKeyListener(null);
-
-
-        //画面初期設定
-        initPage();
-        focusFlg = true;
     }
+
+
 
     private void setViews() {
         toolbar = (Toolbar) findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
+
         FragmentManager manager = getSupportFragmentManager();
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        ExampleFragmentPagerAdapter adapter = new ExampleFragmentPagerAdapter(manager);
-        viewPager.setAdapter(adapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        fpAdapter = new FPAdapter(manager);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setAdapter(fpAdapter);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -127,24 +129,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sSagyoName = excmd;
             showSelectSagyo();
         }
-        else if (cmd.equals(pc.KIK.getString())) {
-            //Vコン存在チェック後、検索結果が返ってくる
-            if (excmd.equals("")) {
-                txtKikai.setText("");
-                show.setText(lblKikai.getText().toString() + "が存在しません。");
-            }
-            else {
-                txtKikai.setText(excmd);
-                focusToNextControl();
-            }
-        }
         else if (cmd.equals(pc.AM1.getString())) {
             //Nothing
         }
         else if (cmd.equals(pc.UPD.getString())) {
             //Toast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT).show();
             MyToast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT, 32f).show();
-            initPage();
         }
         //TODO err時の振る舞い
 
@@ -156,10 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
 
         if (cmd.equals(pc.KIK.getString())) {
-            if (txtKikai.isFocused()) {
-                //TAGテキストをそのまま送信
-                sendMsgToServer(sMsg);
-            }
+
         }
         else if (cmd.equals(pc.AM1.getString())) {
 
@@ -175,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ex:VKO11,AM1123
         */
         txt += pc.KIK.getString();
-        txt += txtKikai.getText().toString();
         txt += ",";
         txt += pc.AM1.getString();
 
@@ -183,25 +169,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return txt;
     }
 
-    private void initPage() {
-        for (int i = 0; i < arrEditText.length; i++) {
-            arrEditText[i].setText("");
-            if (!arrEditText[i].equals(txtSagyo)) {
-                arrEditText[i].setFocusableInTouchMode(false);
-                arrEditText[i].setFocusable(false);
-            }
-        }
-        if (focusFlg) {
-            txtSagyo.requestFocus();
-        }
-    }
-
     @Override
     //クリック処理の実装
     public void onClick(View v) {
         if (v != null) {
+
+            //todo fragmentアクセス時に取得するしかないのか？
+            fragment = fpAdapter.getCurrentFragment();
+
             switch (v.getId()) {
                 case R.id.btnUpd :
+                    /*
                     if (!inputCheck()) {
                         break;
                     }
@@ -220,10 +198,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             })
                             .setNegativeButton("Cancel", null)
                             .show();
+                    */
+                    show.append("upd");
+                    MyToast.makeText(this, "upd", Toast.LENGTH_SHORT, 32f).show();
+                    fragment.setTextOrder("upd");
+                    //viewPager.setCurrentItem(0);
                     break;
 
                 case R.id.btnClear :
-                    initPage();;
+                    //initPage();
+                    show.append("clear");
+                    MyToast.makeText(this, "clear", Toast.LENGTH_SHORT, 32f).show();
+                    fragment.setTextOrder("clear");
                     break;
             }
         }
@@ -235,13 +221,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.txtSagyo :
                     if (hasFocus) {
                         showSelectSagyo();
-                    }
-                    break;
-
-                case R.id.txtKikai :
-                    if (hasFocus) {
-                        show.setText(lblKikai.getText().toString() + "を\n"
-                                        + "スキャンしてください。");
                     }
                     break;
 
@@ -273,42 +252,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    //入力チェック
-    private boolean inputCheck(){
-        for (int i = 0; i < arrEditText.length; i++) {
-            if (TextUtils.isEmpty(arrEditText[i].getText().toString())) {
-                show.setText(arrTextView[i].getText().toString()
-                        +"が未入力です。\nスキャンしてください。");
-                arrEditText[i].requestFocus();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //次のコントロールにフォーカスを当てる
-    private void focusToNextControl(){
-        for (int i = 0; i < arrEditText.length; i++) {
-            if (TextUtils.isEmpty(arrEditText[i].getText().toString())) {
-                //一旦退避用コントロールにフォーカスを移しておく
-                txtHoge.requestFocus();
-
-                if (!arrEditText[i - 1].equals(txtSagyo)) {
-                    arrEditText[i - 1].setFocusableInTouchMode(false);
-                    arrEditText[i - 1].setFocusable(false);
-                }
-                arrEditText[i].setFocusableInTouchMode(true);
-                arrEditText[i].setFocusable(true);
-                arrEditText[i].requestFocus();
-                return;
-            }
-        }
-        //最終まで値のセットが終わっている場合
-        int max = arrEditText.length - 1;
-        txtHoge.requestFocus();
-        arrEditText[max].setFocusableInTouchMode(false);
-        arrEditText[max].setFocusable(false);
-    }
 
     // startActivityForResult で起動させたアクティビティが
     // finish() により破棄されたときにコールされる
@@ -324,8 +267,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case 1001:
                 if (resultCode == RESULT_OK) {
-                    txtSagyo.setText(bundle.getString("key.StringData"));
-                    focusToNextControl();
+                    //txtSagyo.setText(bundle.getString("key.StringData"));
+
+                    //todo fragmentアクセス時に取得するしかないのか？
+                    fragment = fpAdapter.getCurrentFragment();
+                    fragment.setTextOrder(bundle.getString("key.StringData"));
+
 
                 } else if (resultCode == RESULT_CANCELED) {
                     show.setText(
@@ -376,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            test.setText(Integer.toString(viewPager.getCurrentItem()));
             return true;
         }
         return super.onOptionsItemSelected(item);

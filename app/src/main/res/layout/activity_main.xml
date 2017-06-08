@@ -14,220 +14,85 @@ tools:context="com.example.administrator.koyom_client.MainActivity">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolBar"
-            android:layout_width="match_parent"
-            android:layout_height="?actionBarSize"
-            android:background="@color/colorPrimary" />
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorAccent" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
         android:orientation="vertical"
-        android:visibility="invisible"
         android:weightSum="1">
 
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblSagyo"
-                style="@style/TextViewStyle"
-                android:text="作業者" />
-
-            <EditText
-                android:id="@+id/txtSagyo"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblKikai"
-                style="@style/TextViewStyle"
-                android:text="機械No" />
-
-            <EditText
-                android:id="@+id/txtKikai"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
         <LinearLayout
-            style="@style/LinearLayoutStyle"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/lblKokan"
-                style="@style/TextViewStyle"
-                android:text="工管No" />
-
-            <EditText
-                android:id="@+id/txtKokan"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout
-            style="@style/LinearLayoutStyle"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/lblSyori"
-                style="@style/TextViewStyle"
-                android:text="処理粉" />
-
-            <EditText
-                android:id="@+id/txtSyori"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout
-            style="@style/LinearLayoutStyle"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/txtSyoriNM"
-                style="@style/EditTextStyle"
-                android:layout_marginLeft="130dp" />
-        </LinearLayout>
-        <!-- 網・枠 -->
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblWaku7"
-                style="@style/TextViewStyle"
-                android:text="７枠" />
-
-            <EditText
-                android:id="@+id/txtWaku7"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblAmi6"
-                style="@style/TextViewStyle"
-                android:text="６網" />
-
-            <EditText
-                android:id="@+id/txtAmi6"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblWaku5"
-                style="@style/TextViewStyle"
-                android:text="５枠" />
-
-            <EditText
-                android:id="@+id/txtWaku5"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblAmi4"
-                style="@style/TextViewStyle"
-                android:text="４網" />
-
-            <EditText
-                android:id="@+id/txtAmi4"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblWaku3"
-                style="@style/TextViewStyle"
-                android:text="３枠" />
-
-            <EditText
-                android:id="@+id/txtWaku3"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblAmi2"
-                style="@style/TextViewStyle"
-                android:text="２網" />
-
-            <EditText
-                android:id="@+id/txtAmi2"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/LinearLayoutStyle">
-
-            <TextView
-                android:id="@+id/lblWaku1"
-                style="@style/TextViewStyle"
-                android:text="１枠" />
-
-            <EditText
-                android:id="@+id/txtWaku1"
-                style="@style/EditTextStyle" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/show"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.70"
-            android:background="#ffff"
-            android:gravity="top"
-            android:textColor="#FF0000"
-            android:textSize="20sp" />
+            android:layout_height="413dp"
+            android:orientation="vertical"
+            android:layout_weight="0.35">
+
+            <TextView
+                android:id="@+id/test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary" />
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v4.view.ViewPager>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:weightSum="1">
 
-            <Button
-                android:id="@+id/btnClear"
+            <TextView
+                android:id="@+id/show"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="クリア"
+                android:layout_height="91dp"
+                android:background="#ffff"
+                android:gravity="top"
+                android:textColor="#FF0000"
                 android:textSize="20sp" />
 
-            <Button
-                android:id="@+id/btnUpd"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="登録"
-                android:textSize="20sp" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnClear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="クリア"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/btnUpd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="登録"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <EditText
             android:id="@+id/txtHoge"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:enabled="false" />
 
     </LinearLayout>
