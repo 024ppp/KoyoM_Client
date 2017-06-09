@@ -12,10 +12,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-/**
- * Created by yuki on 2016/09/28.
- */
-
 //Viewpagerの中の要素
 //public class Fragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 public class Fragment extends android.support.v4.app.Fragment {

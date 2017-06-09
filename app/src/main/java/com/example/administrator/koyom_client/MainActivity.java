@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ViewPager viewPager;
     FPAdapter fpAdapter;
     Fragment fragment;
-    TextView test;
     TextView show;
     Button btnClear, btnUpd;
     EditText txtHoge;
@@ -48,8 +47,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViews();
-
-        test = (TextView) findViewById(R.id.test) ;
 
         // view取得
         show = (TextView) findViewById(R.id.show);
@@ -80,8 +77,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.nfcWriter = new NfcWriter(this);
 
-        findViewById(R.id.btnClear).setOnClickListener(this);
-        findViewById(R.id.btnUpd).setOnClickListener(this);
+        btnClear.setOnClickListener(this);
+        btnUpd.setOnClickListener(this);
 
         //Fragment切替時の振る舞い
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -91,9 +88,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(state == ViewPager.SCROLL_STATE_SETTLING) {
                     int page = viewPager.getCurrentItem();
                     show.append("" + page);
-			/* ここにしたい処理を書く。例えば、
-			textView.setText(String.valueOf(page));
-			という感じ */
                 }
             }
             @Override
@@ -323,7 +317,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            test.setText(Integer.toString(viewPager.getCurrentItem()));
             return true;
         }
         return super.onOptionsItemSelected(item);
