@@ -4,11 +4,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 /**
  * Created by yuki on 2016/09/28.
  */
 public class FPAdapter extends FragmentPagerAdapter {
     private Fragment mCurrentFragment;
+    ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 
     public FPAdapter(FragmentManager fm) {
         super(fm);
@@ -16,7 +19,10 @@ public class FPAdapter extends FragmentPagerAdapter {
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-        return Fragment.newInstance(position);
+        Fragment fragment = Fragment.newInstance(position);
+        fragments.add(fragment);
+
+        return fragment;
     }
 
     @Override
@@ -39,5 +45,10 @@ public class FPAdapter extends FragmentPagerAdapter {
 
     public Fragment getCurrentFragment() {
         return mCurrentFragment;
+    }
+
+    public Fragment getSelectFragment(int position) {
+        Fragment frg = fragments.get(position);
+        return frg;
     }
 }

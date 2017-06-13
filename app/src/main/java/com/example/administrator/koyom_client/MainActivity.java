@@ -96,10 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 show.append("" + position);
             }
         });
-
     }
-
-
 
     private void setViews() {
         toolbar = (Toolbar) findViewById(R.id.toolBar);
@@ -118,13 +115,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectMotionWhenReceiving(String sMsg) {
         String cmd = pc.COMMAND_LENGTH.getCmdText(sMsg);
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
+        //todo fragmentアクセス時に取得するしかないのか？
+        fragment = fpAdapter.getCurrentFragment();
 
         if (cmd.equals(pc.SAG.getString())) {
             sSagyoName = excmd;
             showSelectSagyo();
         }
-        else if (cmd.equals(pc.AM1.getString())) {
-            //Nothing
+        else if (cmd.equals(pc.KIK.getString())) {
+            //Vコン存在チェック後、検索結果が返ってくる
+            fragment.setTextOrder(excmd);
+            setShowMessage(2);
         }
         else if (cmd.equals(pc.UPD.getString())) {
             //Toast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT).show();
@@ -138,9 +139,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectMotionTagText(String sMsg) {
         String cmd = pc.COMMAND_LENGTH.getCmdText(sMsg);
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
+        //todo fragmentアクセス時に取得するしかないのか？
+        fragment = fpAdapter.getCurrentFragment();
 
         if (cmd.equals(pc.KIK.getString())) {
-
+            if (fragment.checkFocused(1)) {
+                //TAGテキストをそのまま送信
+                sendMsgToServer(sMsg);
+            }
         }
         else if (cmd.equals(pc.AM1.getString())) {
 
@@ -161,6 +167,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         return txt;
+    }
+
+    private void initPage() {
+        Fragment frg;
+        frg = fpAdapter.getSelectFragment(0);
+        frg.initFragmentPage();
+        frg = fpAdapter.getSelectFragment(1);
+        frg.initFragmentPage();
     }
 
     @Override
@@ -200,10 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
 
                 case R.id.btnClear :
-                    //initPage();
-                    show.append("clear");
-                    MyToast.makeText(this, "clear", Toast.LENGTH_SHORT, 32f).show();
-                    fragment.setTextOrder("clear");
+                    initPage();
                     break;
             }
         }
@@ -246,13 +257,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void setShowMessage(int order) {
+        switch (order) {
+            case 1:
+                show.setText("機械Noをスキャンしてください。");
+                break;
+            case 2:
+                show.setText("工管番号をスキャンしてください。");
+                //test
+                viewPager.setCurrentItem(1);
+                break;
+        }
+    }
 
-    // startActivityForResult で起動させたアクティビティが
-    // finish() により破棄されたときにコールされる
-    // requestCode : startActivityForResult の第二引数で指定した値が渡される
-    // resultCode : 起動先のActivity.setResult の第一引数が渡される
-    // Intent data : 起動先Activityから送られてくる Intent
-    //今のところSelectSagyoからの戻り値の取得専用
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -266,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //todo fragmentアクセス時に取得するしかないのか？
                     fragment = fpAdapter.getCurrentFragment();
                     fragment.setTextOrder(bundle.getString("key.StringData"));
-
+                    setShowMessage(1);
 
                 } else if (resultCode == RESULT_CANCELED) {
                     show.setText(

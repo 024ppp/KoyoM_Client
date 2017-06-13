@@ -45,21 +45,46 @@ public class Fragment extends android.support.v4.app.Fragment {
         View view = inflater.inflate(pages[position], null);
 
         setControls(view, position);
+        //初期化
+        initFragmentPage();
         return view;
     }
 
     public void setTextOrder(String txt){
         EditText editText = null;
+
+        //現在、空白のEditTextの中で一番上にあるものを取得する
         for (EditText edt : editTexts) {
             if (TextUtils.isEmpty(edt.getText().toString())) {
                 editText = edt;
                 break;
             }
         }
-        //TODO フォーカス管理もここで！
+        //テキストをセット
         if (editText != null) {
             editText.setText(txt);
+            //値が入ったものは、選択できないようにする
+            editText.setFocusableInTouchMode(false);
+            editText.setFocusable(false);
         }
+
+        //次の空白のEditTextにフォーカスを移動する
+        //todo 全て埋まった場合の動作を追加
+        for (EditText edtNext : editTexts) {
+            if (TextUtils.isEmpty(edtNext.getText().toString())) {
+                edtNext.setFocusableInTouchMode(true);
+                edtNext.setFocusable(true);
+                edtNext.requestFocus();
+                break;
+            }
+        }
+    }
+
+    public boolean checkFocused(int i) {
+        EditText editText = editTexts.get(i);
+
+        Boolean result = editText.isFocused();
+        return result;
     }
 
     private void setControls(View view, int position){
@@ -70,14 +95,33 @@ public class Fragment extends android.support.v4.app.Fragment {
                 txtId = new int[] {R.id.txtSagyo, R.id.txtKikai, R.id.txtKokan};
                 break;
             case 1:
-                txtId = new int[] {R.id.txtWaku7, R.id.txtAmi6, R.id.txtWaku5, R.id.txtAmi4
-                                  , R.id.txtWaku3, R.id.txtAmi2, R.id.txtWaku1};
+                txtId = new int[] {R.id.txtWaku1, R.id.txtAmi2, R.id.txtWaku3, R.id.txtAmi4
+                                  , R.id.txtWaku5, R.id.txtAmi6, R.id.txtWaku7};
                 break;
         }
 
         for (int id : txtId) {
             editTexts.add((EditText) view.findViewById(id));
         }
+    }
 
+    public void initFragmentPage() {
+        EditText editText = null;
+
+        for (int i = 0; i < editTexts.size(); i++) {
+            editText = editTexts.get(i);
+            editText.setText("");
+
+            if (i == 0) {
+                editText.setFocusableInTouchMode(true);
+                editText.setFocusable(true);
+            }
+            else {
+                editText.setFocusableInTouchMode(false);
+                editText.setFocusable(false);
+            }
+        }
+
+        editText.requestFocus();
     }
 }
