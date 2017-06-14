@@ -61,20 +61,20 @@
                 android:layout_height="wrap_content"
                 style="@style/LinearLayoutStyle">
                 <TextView
-                    android:id="@+id/lblSyori"
+                    android:id="@+id/lbl1"
                     android:text="処理粉"
                     style="@style/TextViewStyle"/>
-                <EditText
-                    android:id="@+id/txtSyori"
-                    style="@style/EditTextStyle" />
+                <TextView
+                    android:id="@+id/lblSyori"
+                    style="@style/TextViewStyle_White" />
             </LinearLayout>
             <LinearLayout
                 android:layout_height="wrap_content"
                 style="@style/LinearLayoutStyle">
-                <EditText
+                <TextView
                     android:layout_marginLeft="130dp"
-                    android:id="@+id/txtSyoriNM"
-                    style="@style/EditTextStyle" />
+                    android:id="@+id/lblSyoriNM"
+                    style="@style/TextViewStyle_White" />
             </LinearLayout>
 
         </LinearLayout>

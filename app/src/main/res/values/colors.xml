@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="gray">#A4A4A4</color>
+    <color name="white">#FFFFFF</color>
+    <color name="szk_lbl">#C0C0FF</color>
+    <color name="szk_txt">#FFFFC0</color>
 </resources>

@@ -148,8 +148,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sendMsgToServer(sMsg);
             }
         }
-        else if (cmd.equals(pc.AM1.getString())) {
+        else if (cmd.equals(pc.WAK.getString()) ||
+                  cmd.equals(pc.AMI.getString())) {
+            int page = viewPager.getCurrentItem();
 
+            if (page == 1) {
+                fragment.setTextOrder(excmd);
+            }
         }
     }
 
@@ -163,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         */
         txt += pc.KIK.getString();
         txt += ",";
-        txt += pc.AM1.getString();
 
 
         return txt;
@@ -175,6 +179,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         frg.initFragmentPage();
         frg = fpAdapter.getSelectFragment(1);
         frg.initFragmentPage();
+
+        viewPager.setCurrentItem(0);
+        showSelectSagyo();
     }
 
     @Override
@@ -228,11 +235,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         showSelectSagyo();
                     }
                     break;
-
             }
         }
     }
-
 
     @Override
     //タグを読み込んだ時に実行される
@@ -265,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case 2:
                 show.setText("工管番号をスキャンしてください。");
                 //test
-                viewPager.setCurrentItem(1);
+                //viewPager.setCurrentItem(1);
                 break;
         }
     }
