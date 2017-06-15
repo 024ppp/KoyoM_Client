@@ -8,9 +8,11 @@ public enum ProcessCommand {
     COMMAND_LENGTH("COMMAND_LENGTH", 3),
     SAG("SAG", 1001),
     KIK("KIK", 1002),
-    WAK("WAK", 1003),
-    AMI("AMI", 1004),
-    UPD("UPD", 1005)
+    KOB("KOB", 1003),
+    WAK("WAK", 1004),
+    AMI("AMI", 1005),
+    UPD("UPD", 1006),
+    ERR("ERR", 9999)
     ;
 
     private final String text;

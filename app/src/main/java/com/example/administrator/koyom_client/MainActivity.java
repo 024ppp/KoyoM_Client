@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.barcode.Barcode;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
     Toolbar toolbar;
     TabLayout tabLayout;
@@ -29,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FPAdapter fpAdapter;
     Fragment fragment;
     TextView show;
-    Button btnClear, btnUpd;
+    Button btnClear, btnUpd, btnCam;
     EditText txtHoge;
 
     Handler handler;
@@ -40,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ProcessCommand pc;
 
     String sSagyoName = "";
-    boolean focusFlg = false;
+
+    private static final int RC_BARCODE_CAPTURE = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         show = (TextView) findViewById(R.id.show);
         btnClear = (Button) findViewById(R.id.btnClear);
         btnUpd = (Button) findViewById(R.id.btnUpd);
+        btnCam = (Button) findViewById(R.id.btnCam);
         txtHoge = (EditText) findViewById(R.id.txtHoge);
 
         handler = new Handler()
@@ -79,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnClear.setOnClickListener(this);
         btnUpd.setOnClickListener(this);
+        btnCam.setOnClickListener(this);
 
         //Fragment切替時の振る舞い
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -127,11 +134,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fragment.setTextOrder(excmd);
             setShowMessage(2);
         }
+        else if (cmd.equals(pc.KOB.getString())) {
+            //工程管理番号の検索結果が返ってくる
+            if (!excmd.equals("")) {
+                //受信値を分解、各項目にセット
+                String[] info = excmd.split(",");
+                //工管Noセット
+                fragment.setTextOrder(info[0]);
+
+                //処理粉情報、枠網情報をラベルにセット
+                //1ページ目
+                fragment.setKokanInfo(info);
+                //2ページ目
+                fragment = fpAdapter.getSelectFragment(1);
+                fragment.setKokanInfo(info);
+
+                setShowMessage(3);
+            }
+        }
         else if (cmd.equals(pc.UPD.getString())) {
             //Toast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT).show();
             MyToast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT, 32f).show();
         }
         //TODO err時の振る舞い
+        else if (cmd.equals(pc.ERR.getString())) {
+            show.setText(excmd);
+        }
 
     }
 
@@ -141,19 +169,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
         //todo fragmentアクセス時に取得するしかないのか？
         fragment = fpAdapter.getCurrentFragment();
+        int page = viewPager.getCurrentItem();
 
         if (cmd.equals(pc.KIK.getString())) {
-            if (fragment.checkFocused(1)) {
-                //TAGテキストをそのまま送信
-                sendMsgToServer(sMsg);
+            if (page == 0) {
+                if (fragment.checkFocused(1)) {
+                    //TAGテキストをそのまま送信
+                    sendMsgToServer(sMsg);
+                }
             }
         }
         else if (cmd.equals(pc.WAK.getString()) ||
                   cmd.equals(pc.AMI.getString())) {
-            int page = viewPager.getCurrentItem();
 
             if (page == 1) {
-                fragment.setTextOrder(excmd);
+                if (fragment.checkHantei(excmd)){
+                    fragment.setTextOrder(excmd);
+                }
             }
         }
     }
@@ -193,6 +225,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fragment = fpAdapter.getCurrentFragment();
 
             switch (v.getId()) {
+                case R.id.btnCam :
+                    // launch barcode activity.
+                    Intent intent = new Intent(this, BarcodeCaptureActivity.class);
+                    startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                    break;
+
                 case R.id.btnUpd :
                     /*
                     if (!inputCheck()) {
@@ -269,6 +307,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 2:
                 show.setText("工管番号をスキャンしてください。");
+                break;
+            case 3:
+                show.setText("１枠をスキャンしてください。");
                 //test
                 //viewPager.setCurrentItem(1);
                 break;
@@ -279,15 +320,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
+        //todo fragmentアクセス時に取得するしかないのか？
+        fragment = fpAdapter.getCurrentFragment();
 
         switch (requestCode) {
             case 1001:
                 if (resultCode == RESULT_OK) {
                     //txtSagyo.setText(bundle.getString("key.StringData"));
-
-                    //todo fragmentアクセス時に取得するしかないのか？
-                    fragment = fpAdapter.getCurrentFragment();
-                    fragment.setTextOrder(bundle.getString("key.StringData"));
+                    String value = bundle.getString("key.StringData");
+                    fragment.setTextOrder(value);
                     setShowMessage(1);
 
                 } else if (resultCode == RESULT_CANCELED) {
@@ -297,6 +338,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     + "\ndata:" + bundle.getString("key.canceledData"));
                 }
                 break;
+
+            case RC_BARCODE_CAPTURE:
+                if (resultCode == CommonStatusCodes.SUCCESS) {
+                    if (data != null) {
+                        Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+                        String value = barcode.displayValue;
+                        int page = viewPager.getCurrentItem();
+
+                        //ページ１で、工管Noにフォーカスがある場合のみ、サーバにメッセージ送信
+                        if (page == 0) {
+                            if (fragment.checkFocused(2)) {
+                                String msg = pc.KOB.getString() + value;
+                                sendMsgToServer(msg);
+                            }
+                            else {
+                                fragment.setTextOrder(value);
+                            }
+                        }
+                        else {
+                            fragment.setTextOrder(value);
+                        }
+
+                        Log.d("Barcode", "Barcode read: " + barcode.displayValue);
+                    } else {
+                        Log.d("Barcode", "No barcode captured, intent data is null");
+                    }
+                } else {
+
+                }
 
             default:
                 break;

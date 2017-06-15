@@ -47,7 +47,8 @@
             </LinearLayout>
             <LinearLayout
                 android:layout_height="wrap_content"
-                style="@style/LinearLayoutStyle">
+                style="@style/LinearLayoutStyle"
+                android:weightSum="1">
                 <TextView
                     android:id="@+id/lblKokan"
                     android:text="工管No"
