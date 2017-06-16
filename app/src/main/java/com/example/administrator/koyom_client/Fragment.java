@@ -1,6 +1,8 @@
 package com.example.administrator.koyom_client;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -24,6 +26,7 @@ import static com.example.administrator.koyom_client.R.layout.toast;
 public class Fragment extends android.support.v4.app.Fragment implements View.OnClickListener, View.OnFocusChangeListener, View.OnKeyListener {
     private final static String POSITION = "POSITION";
     private int mPosition;
+    private ColorStateList mDefaultColor = null;
     int[] pages = { R.layout.zenhan, R.layout.kouhan};
     ArrayList<EditText> editTexts = new ArrayList<EditText>();
     ArrayList<TextView> textViews = new ArrayList<TextView>();
@@ -103,6 +106,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     }
 
     //手入力対応の本処理
+    //todo MainActivityに情報を送れないものか...
     private void pressedEnter(int id) {
         switch (id) {
             case R.id.txtKokan:
@@ -132,10 +136,13 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
 
                 if (sWakuAmi.equals(txt_Set)){
                     textView_Hantei.setText("OK");
+                    textView_Hantei.setTextColor(mDefaultColor);
                     return true;
                 }
                 else {
                     textView_Hantei.setText("NG");
+                    textView_Hantei.setTextColor(Color.RED);
+                    return false;
                 }
             }
         }
@@ -203,6 +210,25 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         }
     }
 
+    public String getForUpdateText() {
+        String txt = "";
+
+        switch (mPosition) {
+            case 0:
+                EditText editText = editTexts.get(1);
+                txt = editText.getText().toString();
+                break;
+
+            case 1:
+                for (EditText editText1 : editTexts) {
+                    txt += "," + editText1.getText().toString();
+                }
+                break;
+        }
+
+        return txt;
+    }
+
     private void setControls(View view, int position){
         int[] txtId = null;
         int[] lblId = null;
@@ -245,6 +271,11 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
             TextView textView = (TextView) view.findViewById(id);
             //幅崩れ対策
             textView.setWidth(textView.getWidth());
+
+            //TextViewのデフォルト色を保持
+            if (mDefaultColor == null) {
+                mDefaultColor = textView.getTextColors();
+            }
 
             textViews.add(textView);
         }

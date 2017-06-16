@@ -3,8 +3,10 @@ package com.example.administrator.koyom_client;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,7 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ProcessCommand pc;
 
     String sSagyoName = "";
+    private int mWakuamiNo;
 
+    private static final int SETTING = 8888;
     private static final int RC_BARCODE_CAPTURE = 9001;
 
     @Override
@@ -74,9 +78,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
 
-        //IP & Port取得
-        final String ip = getString(R.string.ip);
-        final int myPort = getResources().getInteger(R.integer.myPort);
+        //接続先を取得
+        SharedPreferences prefs = getSharedPreferences("ConnectionData", Context.MODE_PRIVATE);
+        final String ip = prefs.getString("ip", "");
+        final int myPort = prefs.getInt("myPort", 0);
         clientThread = new ClientThread(handler, ip, myPort);
         // サーバ接続スレッド開始
         new Thread(clientThread).start();
@@ -87,20 +92,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnUpd.setOnClickListener(this);
         btnCam.setOnClickListener(this);
 
+        //登録ボタンを無効化
+        btnUpd.setEnabled(false);
+
         //Fragment切替時の振る舞い
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             //スクロール状態が変化したときに呼び出される
             public void onPageScrollStateChanged(int state) {
                 if(state == ViewPager.SCROLL_STATE_SETTLING) {
-                    int page = viewPager.getCurrentItem();
-                    show.append("" + page);
+                    //int page = viewPager.getCurrentItem();
+                    //show.append("" + page);
                 }
             }
             @Override
             //ページが切り替わった時に呼び出される
             public void onPageSelected(int position) {
-                show.append("" + position);
+                //show.append("" + position);
             }
         });
     }
@@ -153,8 +161,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         else if (cmd.equals(pc.UPD.getString())) {
-            //Toast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT).show();
             MyToast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT, 32f).show();
+            initPage();
         }
         //TODO err時の振る舞い
         else if (cmd.equals(pc.ERR.getString())) {
@@ -185,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (page == 1) {
                 if (fragment.checkHantei(excmd)){
                     fragment.setTextOrder(excmd);
+                    setShowMessage(4);
                 }
             }
         }
@@ -192,27 +201,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //登録ボタン押下時にサーバに送る更新値の生成
     private String createUpdText() {
+        Fragment frg;
         String txt = "";
-        /*
-        ●更新値のフォーマット
-        各コマンド文字列 + 値, 各コマンド文字列 + 値,･･･
-        ex:VKO11,AM1123
-        */
-        txt += pc.KIK.getString();
-        txt += ",";
 
-
+        for (int i = 0; i < 2; i++) {
+            //i = 0 : 機械No取得 /i = 1 : 枠網取得
+            frg = fpAdapter.getSelectFragment(i);
+            txt += frg.getForUpdateText();
+        }
         return txt;
     }
 
     private void initPage() {
         Fragment frg;
-        frg = fpAdapter.getSelectFragment(0);
-        frg.initFragmentPage();
-        frg = fpAdapter.getSelectFragment(1);
-        frg.initFragmentPage();
 
+        for (int i = 0; i < 2; i++) {
+            frg = fpAdapter.getSelectFragment(i);
+            frg.initFragmentPage();
+        }
+
+        //1ページ目に戻る
         viewPager.setCurrentItem(0);
+        //登録ボタンを無効化
+        btnUpd.setEnabled(false);
+
         showSelectSagyo();
     }
 
@@ -232,10 +244,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
 
                 case R.id.btnUpd :
-                    /*
-                    if (!inputCheck()) {
-                        break;
-                    }
                     //Dialog(OK,Cancel Ver.)
                     new AlertDialog.Builder(this)
                             .setTitle("確認")
@@ -251,11 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             })
                             .setNegativeButton("Cancel", null)
                             .show();
-                    */
-                    show.append("upd");
-                    MyToast.makeText(this, "upd", Toast.LENGTH_SHORT, 32f).show();
-                    fragment.setTextOrder("upd");
-                    //viewPager.setCurrentItem(0);
+
                     break;
 
                 case R.id.btnClear :
@@ -309,9 +313,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 show.setText("工管番号をスキャンしてください。");
                 break;
             case 3:
-                show.setText("１枠をスキャンしてください。");
-                //test
                 //viewPager.setCurrentItem(1);
+                show.setText("1枠をスキャンしてください。");
+                //次の枠網番号をセット
+                mWakuamiNo = 2;
+                break;
+            case 4:
+                String wakuamiNo = Integer.toString(mWakuamiNo);
+
+                if (mWakuamiNo % 2 == 0) {
+                    show.setText(wakuamiNo + "網をスキャンしてください。");
+                }
+                else {
+                    show.setText(wakuamiNo + "枠をスキャンしてください。");
+                }
+                //次の枠網番号をセット
+                mWakuamiNo++;
+
+                if (mWakuamiNo > 8) {
+                    show.setText("登録ボタンを押してください。");
+                    btnUpd.setEnabled(true);
+                }
                 break;
         }
     }
@@ -339,6 +361,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
 
+            case SETTING:
+                Toast.makeText(this, "Setting has been completed.", Toast.LENGTH_SHORT).show();
+                break;
+
             case RC_BARCODE_CAPTURE:
                 if (resultCode == CommonStatusCodes.SUCCESS) {
                     if (data != null) {
@@ -353,11 +379,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 sendMsgToServer(msg);
                             }
                             else {
-                                fragment.setTextOrder(value);
+                                //工管No以外でカメラ使用を許可するかどうか
+                                //現時点では許可しない
+                                //fragment.setTextOrder(value);
                             }
                         }
                         else {
-                            fragment.setTextOrder(value);
+                            //工管No以外でカメラ使用を許可するかどうか
+                            //現時点では許可しない
+                            //fragment.setTextOrder(value);
                         }
 
                         Log.d("Barcode", "Barcode read: " + barcode.displayValue);
@@ -409,6 +439,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //設定画面呼び出し
+            Intent intent = new Intent(this, Setting.class);
+            int requestCode = SETTING;
+            startActivityForResult(intent, requestCode);
             return true;
         }
         return super.onOptionsItemSelected(item);
