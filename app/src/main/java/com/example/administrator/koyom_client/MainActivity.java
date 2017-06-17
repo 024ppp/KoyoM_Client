@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
+  //todo Fragmentへの直接アクセスは禁止。FPAdapter越しに関数を呼び出すよう改修
     Toolbar toolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectMotionWhenReceiving(String sMsg) {
         String cmd = pc.COMMAND_LENGTH.getCmdText(sMsg);
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
-        //todo fragmentアクセス時に取得するしかないのか？
+        //todo fpAdapterにsetTextOrderを実装。引数にページ数とメッセージを渡してやる
         fragment = fpAdapter.getCurrentFragment();
 
         if (cmd.equals(pc.SAG.getString())) {
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectMotionTagText(String sMsg) {
         String cmd = pc.COMMAND_LENGTH.getCmdText(sMsg);
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
-        //todo fragmentアクセス時に取得するしかないのか？
+        //todo fpAdapterにsetTextOrderを実装。引数にページ数とメッセージを渡してやる
         fragment = fpAdapter.getCurrentFragment();
         int page = viewPager.getCurrentItem();
 
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v != null) {
 
-            //todo fragmentアクセス時に取得するしかないのか？
+            //todo fpAdapterにsetTextOrderを実装。引数にページ数とメッセージを渡してやる
             fragment = fpAdapter.getCurrentFragment();
 
             switch (v.getId()) {
@@ -342,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
-        //todo fragmentアクセス時に取得するしかないのか？
+        //todo fpAdapterにsetTextOrderを実装。引数にページ数とメッセージを渡してやる
         fragment = fpAdapter.getCurrentFragment();
 
         switch (requestCode) {
