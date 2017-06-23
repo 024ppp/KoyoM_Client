@@ -56,7 +56,7 @@ tools:context="com.example.administrator.koyom_client.MainActivity">
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="#ffff"
-                android:gravity="top"
+                android:gravity="center_vertical"
                 android:textColor="#FF0000"
                 android:textSize="20sp" />
             <Button
@@ -89,12 +89,6 @@ tools:context="com.example.administrator.koyom_client.MainActivity">
             </LinearLayout>
 
         </LinearLayout>
-
-        <EditText
-            android:id="@+id/txtHoge"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:enabled="false" />
 
     </LinearLayout>
 

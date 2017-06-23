@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
   //todo Fragmentへの直接アクセスは禁止。FPAdapter越しに関数を呼び出すよう改修
     Toolbar toolbar;
     TabLayout tabLayout;
@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Fragment fragment;
     TextView show;
     Button btnClear, btnUpd, btnCam;
-    EditText txtHoge;
 
     Handler handler;
     // サーバと通信するスレッド
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnClear = (Button) findViewById(R.id.btnClear);
         btnUpd = (Button) findViewById(R.id.btnUpd);
         btnCam = (Button) findViewById(R.id.btnCam);
-        txtHoge = (EditText) findViewById(R.id.txtHoge);
 
         handler = new Handler()
         {
@@ -116,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setViews() {
         toolbar = (Toolbar) findViewById(R.id.toolBar);
+        toolbar.setTitle("Ｂ棟ふるい網目セット管理");
         setSupportActionBar(toolbar);
 
         FragmentManager manager = getSupportFragmentManager();
@@ -265,18 +264,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 case R.id.btnClear :
                     initPage();
-                    break;
-            }
-        }
-    }
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (v != null) {
-            switch (v.getId()) {
-                case R.id.txtSagyo :
-                    if (hasFocus) {
-                        showSelectSagyo();
-                    }
                     break;
             }
         }

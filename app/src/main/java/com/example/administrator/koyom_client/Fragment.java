@@ -106,7 +106,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     }
 
     //手入力対応の本処理
-    //todo MainActivityに情報を送れないものか...
+    //todo  MainActivityに情報を送れないものか...
     private void pressedEnter(int id) {
         switch (id) {
             case R.id.txtKokan:
@@ -117,7 +117,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         }
     }
 
-    //todo バグだらき
     public boolean checkHantei(String sWakuAmi){
         //
         TextView textView_Hantei;
@@ -169,7 +168,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         }
 
         //次の空白のEditTextにフォーカスを移動する
-        //todo 全て埋まった場合の動作を追加
+        //todo 全て埋まった場合の動作を追加(要らない？)
         for (EditText edtNext : editTexts) {
             if (TextUtils.isEmpty(edtNext.getText().toString())) {
                 edtNext.setFocusableInTouchMode(true);
@@ -187,6 +186,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         return result;
     }
 
+    //TextViewに工程管理番号から取得した情報をセットする
     public void setKokanInfo(String[] info) {
         TextView textView;
 
@@ -210,6 +210,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         }
     }
 
+    //各EditTextから、更新時に必要な情報を取得する
     public String getForUpdateText() {
         String txt = "";
 
