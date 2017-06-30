@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import static com.example.administrator.koyom_client.R.layout.toast;
 
 //Viewpagerの中の要素
-//public class Fragment extends android.support.v4.app.Fragment implements View.OnClickListener {
-public class Fragment extends android.support.v4.app.Fragment implements View.OnClickListener, View.OnFocusChangeListener, View.OnKeyListener {
+public class Fragment extends android.support.v4.app.Fragment implements View.OnClickListener, View.OnKeyListener {
     private final static String POSITION = "POSITION";
     private int mPosition;
     private ColorStateList mDefaultColor = null;
@@ -48,19 +47,14 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        /*
-        View view = inflater.inflate(R.layout.fragment_main, null);
-        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.fragment_main_linearlayout);
-        linearLayout.setBackgroundResource(getArguments().getInt(BACKGROUND_COLOR));
-        */
+
         int position = getArguments().getInt(POSITION);
         View view = inflater.inflate(pages[position], null);
 
-        //editTexts作成
+        //コントロール設定
         setControls(view, position);
         //初期化
         initFragmentPage();
-
         //position保持
         mPosition = position;
 
@@ -81,22 +75,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         }
         else {
             return false;
-        }
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (v != null) {
-            if (mPosition == 0) {
-                switch (v.getId()) {
-                    /*
-                    case R.id.txtKokan:
-                        EditText editText = editTexts.get(2);
-                        editText.setText("OK");
-                        break;
-                    */
-                }
-            }
         }
     }
 
@@ -238,17 +216,14 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         switch(position) {
             case 0:
                 txtId = new int[] {R.id.txtSagyo, R.id.txtKikai, R.id.txtKokan};
-
                 lblId = new int[] {R.id.lblSyori, R.id.lblSyoriNM};
 
                 break;
             case 1:
                 txtId = new int[] {R.id.txtWaku1, R.id.txtAmi2, R.id.txtWaku3, R.id.txtAmi4
                                   , R.id.txtWaku5, R.id.txtAmi6, R.id.txtWaku7};
-
                 lblId = new int[] {R.id.lblSet1, R.id.lblSet2, R.id.lblSet3, R.id.lblSet4
                                   , R.id.lblSet5, R.id.lblSet6, R.id.lblSet7};
-
                 lblId_Hantei = new int[] {R.id.lblHantei1, R.id.lblHantei2, R.id.lblHantei3, R.id.lblHantei4
                                          , R.id.lblHantei5, R.id.lblHantei6, R.id.lblHantei7};
                 break;
@@ -259,8 +234,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
             EditText editText = (EditText) view.findViewById(id);
             //タグスキャン時の幅崩れ対策
             editText.setWidth(editText.getWidth());
-            //FocusChange対応
-            editText.setOnFocusChangeListener(this);
             //手入力対応
             editText.setOnKeyListener(this);
 
