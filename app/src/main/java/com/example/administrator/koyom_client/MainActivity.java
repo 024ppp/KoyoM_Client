@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -51,10 +52,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int SETTING = 8888;
     private static final int RC_BARCODE_CAPTURE = 9001;
 
+    //バイブ
+    Vibrator vib;
+    private long m_vibPattern_read[] = {0, 200};
+    private long m_vibPattern_error[] = {0, 200, 200, 500};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //バイブ
+        vib = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+
         setViews();
 
         // view取得
@@ -166,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //TODO err時の振る舞い
         else if (cmd.equals(pc.ERR.getString())) {
+            //バイブ
+            vib.vibrate(m_vibPattern_error, -1);
             show.setText(excmd);
         }
 
@@ -275,8 +286,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onNewIntent(intent);
         String tagText = "";
         tagText = this.nfcWriter.getTagText(intent);
-
         selectMotionTagText(tagText);
+        //バイブ
+        vib.vibrate(m_vibPattern_read, -1);
     }
 
     //サーバへメッセージを送信する
