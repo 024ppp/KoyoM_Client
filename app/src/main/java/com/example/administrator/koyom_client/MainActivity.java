@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -64,9 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //バイブ
         vib = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 
-        setViews();
-
         // view取得
+        setViews();
         show = (TextView) findViewById(R.id.show);
         btnClear = (Button) findViewById(R.id.btnClear);
         btnUpd = (Button) findViewById(R.id.btnUpd);
@@ -135,6 +135,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    //Fragmentからのエンターキー押下処理。手入力対応
+    public void onEnterPushed(String msg, int num) {
+        switch (num) {
+            case 1:
+                //機械No
+                sendMsgToServer(pc.KIK.getString() + msg);
+                break;
+            case 2:
+                //工程管理番号
+                sendMsgToServer(pc.KOB.getString() + msg);
+                break;
+            default:
+                //枠網
+                if (fragment.checkHantei(msg)){
+                    fragment.setTextOrder(msg);
+                    setShowMessage(4);
+                }
+                break;
+        }
+    }
+
     //受信した文字列のコマンド値によって分岐（switch文ではenum使えず...if文汚し）
     private void selectMotionWhenReceiving(String sMsg) {
         String cmd = pc.COMMAND_LENGTH.getCmdText(sMsg);
@@ -165,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //2ページ目
                 fragment = fpAdapter.getSelectFragment(1);
                 fragment.setKokanInfo(info);
+                //ページ遷移
+                viewPager.setCurrentItem(1);
 
                 setShowMessage(3);
             }
@@ -176,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //TODO err時の振る舞い
         else if (cmd.equals(pc.ERR.getString())) {
             //バイブ
-            vib.vibrate(m_vibPattern_error, -1);
+            //vib.vibrate(m_vibPattern_error, -1);
             show.setText(excmd);
         }
 
@@ -207,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     setShowMessage(4);
                 }
             }
+        }
+        else {
+            show.setText("タグテキストエラー！");
         }
     }
 
@@ -286,9 +312,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onNewIntent(intent);
         String tagText = "";
         tagText = this.nfcWriter.getTagText(intent);
-        selectMotionTagText(tagText);
+        if (!tagText.equals("")) {
+            selectMotionTagText(tagText);
+        }
         //バイブ
-        vib.vibrate(m_vibPattern_read, -1);
+        //vib.vibrate(m_vibPattern_read, -1);
     }
 
     //サーバへメッセージを送信する
@@ -313,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 show.setText("工管番号をスキャンしてください。");
                 break;
             case 3:
-                //viewPager.setCurrentItem(1);
                 show.setText("1枠をスキャンしてください。");
                 //次の枠網番号をセット
                 mWakuamiNo = 2;

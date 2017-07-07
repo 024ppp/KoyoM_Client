@@ -1,5 +1,6 @@
 package com.example.administrator.koyom_client;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -57,24 +58,57 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         initFragmentPage();
         //position保持
         mPosition = position;
-
         return view;
     }
 
     //手入力対応
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (v != null) {
-            //イベントを取得するタイミングには、ボタンが押されてなおかつエンターキーだったときを指定
-            if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                Log.d("OnKey", "Enter : " + Integer.toString(v.getId()));
-                pressedEnter(v.getId());
-                return true;
+        try {
+            if (v != null) {
+                //イベントを取得するタイミングには、ボタンが押されてなおかつエンターキーだったときを指定
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    //DEBUG
+                    Log.d("OnKey", "Enter : " + Integer.toString(v.getId()));
+
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    //ページ分岐
+                    switch (mPosition){
+                        case 0:
+                            switch (v.getId()) {
+                                case R.id.txtKikai:
+                                    pressedEnter(mainActivity, 1);
+                                    break;
+                                case R.id.txtKokan:
+                                    pressedEnter(mainActivity, 2);
+                                    break;
+                            }
+                            break;
+                        case 1:
+                            //枠網の手入力
+                            for (int i = 0; i < 7; i++) {
+                                if (checkFocused(i)) {
+                                    pressedEnter(mainActivity, i);
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+
+
+                    //キーボードをしまう
+                    InputMethodManager imm = (InputMethodManager)mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    return true;
+                }
+                return false;
             }
-            return false;
-        }
-        else {
-            return false;
+            else {
+                return false;
+            }
+
+        } catch (ClassCastException e) {
+            throw new ClassCastException("activity が OnOkBtnClickListener を実装していません.");
         }
     }
 
@@ -84,14 +118,17 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     }
 
     //手入力対応の本処理
-    //todo  MainActivityに情報を送れないものか...
-    private void pressedEnter(int id) {
-        switch (id) {
-            case R.id.txtKokan:
-                EditText editText = editTexts.get(2);
-                editText.setText("Enter");
-
-                break;
+    private void pressedEnter(MainActivity mainActivity, int num) {
+        EditText editText = editTexts.get(num);
+        String msg = editText.getText().toString();
+        //フォーカス中のEditTextをクリア
+        editText.setText("");
+        //ページ分岐
+        if (mPosition == 0) {
+            mainActivity.onEnterPushed(msg, num);
+        }
+        else {
+            mainActivity.onEnterPushed(msg, num + 10);
         }
     }
 
@@ -167,7 +204,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     //TextViewに工程管理番号から取得した情報をセットする
     public void setKokanInfo(String[] info) {
         TextView textView;
-
         switch (mPosition) {
             case 0:
                 for (int i = 0; i < textViews.size(); i++) {
