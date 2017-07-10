@@ -187,6 +187,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fragment = fpAdapter.getSelectFragment(1);
                 fragment.setKokanInfo(info);
                 //ページ遷移
+                try {
+                    //遷移時のカクつき対策
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 viewPager.setCurrentItem(1);
 
                 setShowMessage(3);
