@@ -28,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -37,6 +38,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -50,6 +52,8 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Activity for the multi-tracker app.  This app detects barcodes and displays the value with the
@@ -77,6 +81,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
     // helper objects for detecting taps and pinches.
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
+
+    private Timer mTimer = null;
+    private Handler mHandler = null;
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -107,9 +114,48 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
-        Snackbar.make(mGraphicOverlay, "Tap to capture. Pinch/Stretch to zoom",
+        Snackbar.make(mGraphicOverlay, "工管番号をスキャンしてください。",
                 Snackbar.LENGTH_LONG)
                 .show();
+
+        //20170725 Y.Onishi
+        //バーコード自動取得対応
+        mHandler = new Handler();
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 実行したい処理
+                        Barcode best = null;
+                        for (BarcodeGraphic graphic : mGraphicOverlay.getGraphics()) {
+                            best = graphic.getBarcode();
+                        }
+
+                        if (best != null) {
+                            Intent data = new Intent();
+                            data.putExtra(BarcodeObject, best);
+                            setResult(CommonStatusCodes.SUCCESS, data);
+                            finish();
+                        }
+                    }
+                });
+            }
+        }, 500, 500); // 実行したい間隔(ミリ秒)
+
+        /*
+        //キャンセルボタン実装
+        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // クリック時の処理
+                setResult(CommonStatusCodes.CANCELED);
+                finish();
+            }
+        });
+        */
     }
 
     /**
@@ -234,6 +280,10 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
         super.onPause();
         if (mPreview != null) {
             mPreview.stop();
+        }
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
         }
     }
 

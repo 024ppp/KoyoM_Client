@@ -7,4 +7,5 @@
     <color name="white">#FFFFFF</color>
     <color name="szk_lbl">#C0C0FF</color>
     <color name="szk_txt">#FFFFC0</color>
+    <color name="accent">#FF4081</color>
 </resources>

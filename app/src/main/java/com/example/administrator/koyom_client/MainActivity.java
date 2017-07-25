@@ -100,8 +100,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnUpd.setOnClickListener(this);
         btnCam.setOnClickListener(this);
 
-        //登録ボタンを無効化
+        //カメラ起動、登録ボタンを無効化
+        btnCam.setEnabled(false);
         btnUpd.setEnabled(false);
+        //初期メッセージ
+        show.setText("サーバー通信なし。");
 
         //Fragment切替時の振る舞い
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -171,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Vコン存在チェック後、検索結果が返ってくる
             fragment.setTextOrder(excmd);
             setShowMessage(2);
+            //カメラ起動を有効化
+            btnCam.setEnabled(true);
         }
         else if (cmd.equals(pc.KOB.getString())) {
             //工程管理番号の検索結果が返ってくる
@@ -196,6 +201,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 viewPager.setCurrentItem(1);
 
                 setShowMessage(3);
+                //カメラ起動を無効化
+                btnCam.setEnabled(false);
             }
         }
         else if (cmd.equals(pc.UPD.getString())) {
@@ -229,7 +236,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (cmd.equals(pc.WAK.getString()) ||
                   cmd.equals(pc.AMI.getString())) {
-
             if (page == 1) {
                 if (fragment.checkHantei(excmd)){
                     fragment.setTextOrder(excmd);
@@ -302,11 +308,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             })
                             .setNegativeButton("Cancel", null)
                             .show();
-
                     break;
 
                 case R.id.btnClear :
-                    initPage();
+                    //Dialog(OK,Cancel Ver.)
+                    new AlertDialog.Builder(this)
+                            .setTitle("確認")
+                            .setMessage("クリアしてよろしいですか？")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // OK button pressed
+                                    initPage();
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
                     break;
             }
         }
@@ -341,13 +358,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setShowMessage(int order) {
         switch (order) {
             case 1:
-                show.setText("機械Noをスキャンしてください。");
+                show.setText("機械Noをタッチしてください。");
                 break;
             case 2:
                 show.setText("工管番号をスキャンしてください。");
                 break;
             case 3:
-                show.setText("1枠をスキャンしてください。");
+                show.setText("1枠をタッチしてください。");
                 //次の枠網番号をセット
                 mWakuamiNo = 2;
                 break;
@@ -355,16 +372,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String wakuamiNo = Integer.toString(mWakuamiNo);
 
                 if (mWakuamiNo % 2 == 0) {
-                    show.setText(wakuamiNo + "網をスキャンしてください。");
+                    show.setText(wakuamiNo + "網をタッチしてください。");
                 }
                 else {
-                    show.setText(wakuamiNo + "枠をスキャンしてください。");
+                    show.setText(wakuamiNo + "枠をタッチしてください。");
                 }
                 //次の枠網番号をセット
                 mWakuamiNo++;
 
                 if (mWakuamiNo > 8) {
-                    show.setText("登録ボタンを押してください。");
+                    show.setText("全てOKです。\n登録してください。");
                     btnUpd.setEnabled(true);
                 }
                 break;
@@ -428,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.d("Barcode", "No barcode captured, intent data is null");
                     }
                 } else {
-
+                    Log.d("Barcode", "Canceled");
                 }
 
             default:
@@ -491,6 +508,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("name", sSagyoName);
         int requestCode = pc.SAG.getInt();
         startActivityForResult(intent, requestCode);
+        //作業者名取得に時間がかかる時があるため、取得中メッセージを表示
+        show.setText("作業者名取得中・・・");
     }
 
     private PendingIntent createPendingIntent() {

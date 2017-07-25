@@ -37,7 +37,7 @@
                 android:id="@+id/textView2"
                 style="@style/TextViewStyle_Page2_Title"
                 android:layout_width="151dp"
-                android:text="バーコード" />
+                android:text="枠網" />
 
             <TextView
                 android:id="@+id/textView3"

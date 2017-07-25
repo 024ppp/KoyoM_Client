@@ -70,7 +70,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     //DEBUG
                     Log.d("OnKey", "Enter : " + Integer.toString(v.getId()));
-
+                    //エラーになるため、エンターの度にGetする
                     MainActivity mainActivity = (MainActivity) getActivity();
                     //ページ分岐
                     switch (mPosition){
@@ -148,6 +148,12 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 textView_Set = textViews.get(i);
                 txt_Set = textView_Set.getText().toString();
 
+                //設定値が空（工程管理番号が未スキャン）の場合は処理を行わない
+                if (txt_Set.equals("")) {
+                    return false;
+                }
+
+                //判定処理
                 if (sWakuAmi.equals(txt_Set)){
                     textView_Hantei.setText("OK");
                     textView_Hantei.setTextColor(mDefaultColor);
@@ -230,11 +236,13 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
 
         switch (mPosition) {
             case 0:
+                //mPosition = 0 : 機械No取得
                 EditText editText = editTexts.get(1);
                 txt = editText.getText().toString();
                 break;
 
             case 1:
+                //mPosition = 1 : 枠網取得
                 for (EditText editText1 : editTexts) {
                     txt += "," + editText1.getText().toString();
                 }
