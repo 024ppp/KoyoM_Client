@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int SETTING = 8888;
     private static final int RC_BARCODE_CAPTURE = 9001;
 
-    //バイブ
+    //バイブ未使用
     Vibrator vib;
     private long m_vibPattern_read[] = {0, 200};
     private long m_vibPattern_error[] = {0, 200, 200, 500};
