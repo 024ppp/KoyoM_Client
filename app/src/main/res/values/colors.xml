@@ -8,4 +8,7 @@
     <color name="szk_lbl">#C0C0FF</color>
     <color name="szk_txt">#FFFFC0</color>
     <color name="accent">#FF4081</color>
+    <color name="tabBack">#FE2E64</color>
+    <color name="nomBack">#F2F2F2</color>
+    <color name="gray2">#E6E6E6</color>
 </resources>

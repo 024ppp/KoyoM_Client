@@ -180,6 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if (cmd.equals(pc.KOB.getString())) {
             //工程管理番号の検索結果が返ってくる
             if (!excmd.equals("")) {
+                //バイブ
+                vib.vibrate(m_vibPattern_read, -1);
+
                 //受信値を分解、各項目にセット
                 String[] info = excmd.split(",");
                 //工管Noセット
@@ -192,12 +195,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fragment = fpAdapter.getSelectFragment(1);
                 fragment.setKokanInfo(info);
                 //ページ遷移
-                try {
-                    //遷移時のカクつき対策
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 viewPager.setCurrentItem(1);
 
                 setShowMessage(3);
@@ -211,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //TODO err時の振る舞い
         else if (cmd.equals(pc.ERR.getString())) {
-            //バイブ
-            //vib.vibrate(m_vibPattern_error, -1);
+            //バイブ エラー
+            vib.vibrate(m_vibPattern_error, -1);
             show.setText(excmd);
         }
 
@@ -281,10 +278,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //クリック処理の実装
     public void onClick(View v) {
         if (v != null) {
-
-            //todo fpAdapterにsetTextOrderを実装。引数にページ数とメッセージを渡してやる
-            fragment = fpAdapter.getCurrentFragment();
-
             switch (v.getId()) {
                 case R.id.btnCam :
                     // launch barcode activity.
@@ -339,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectMotionTagText(tagText);
         }
         //バイブ
-        //vib.vibrate(m_vibPattern_read, -1);
+        vib.vibrate(m_vibPattern_read, -1);
     }
 
     //サーバへメッセージを送信する
@@ -412,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case SETTING:
-                Toast.makeText(this, "Setting has been completed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "設定が完了しました。", Toast.LENGTH_SHORT).show();
                 break;
 
             case RC_BARCODE_CAPTURE:
@@ -428,16 +421,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 String msg = pc.KOB.getString() + value;
                                 sendMsgToServer(msg);
                             }
-                            else {
-                                //工管No以外でカメラ使用を許可するかどうか
-                                //現時点では許可しない
-                                //fragment.setTextOrder(value);
-                            }
-                        }
-                        else {
-                            //工管No以外でカメラ使用を許可するかどうか
-                            //現時点では許可しない
-                            //fragment.setTextOrder(value);
                         }
 
                         Log.d("Barcode", "Barcode read: " + barcode.displayValue);

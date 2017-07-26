@@ -35,11 +35,12 @@ tools:context="com.example.administrator.koyom_client.MainActivity">
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabTextColor="@color/accent"
+                app:tabTextColor="@color/gray"
                 app:tabSelectedTextColor="@color/white"
                 app:tabTextAppearance="@style/TabText"
-                app:tabBackground="@drawable/tab_color_selector" />
-                <!--android:background="@color/colorAccent" />-->
+                app:tabBackground="@drawable/tab_color_selector"
+            />
+
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewPager"

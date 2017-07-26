@@ -83,7 +83,7 @@
 
     <style name="TabText" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
-        <item name="textAllCaps">false</item>
+        <item name="textAllCaps">true</item>
     </style>
 
     <style name="ToolbarTheme" parent="Theme.AppCompat.NoActionBar">
