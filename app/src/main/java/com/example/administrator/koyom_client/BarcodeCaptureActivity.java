@@ -408,7 +408,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
                 bestDistance = distance;
             }
         }
-
+        /*
         if (best != null) {
             Intent data = new Intent();
             data.putExtra(BarcodeObject, best);
@@ -417,6 +417,13 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
             return true;
         }
         return false;
+        */
+        //画面タップでカメラ画面終了
+        Intent data = new Intent();
+        data.putExtra(BarcodeObject, "");
+        setResult(CommonStatusCodes.SUCCESS, data);
+        finish();
+        return true;
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {

@@ -23,6 +23,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateAlwaysHidden"
+            android:launchMode="singleTask"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,7 +32,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SelectSagyo"></activity>
+        <activity
+            android:name=".SelectSagyo"
+            android:launchMode="singleTask"
+            >
+        </activity>
+
         <activity android:name=".Setting"></activity>
         <activity android:name=".BarcodeCaptureActivity"
             android:label="Read Barcode"/>

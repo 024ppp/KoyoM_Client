@@ -47,8 +47,46 @@ public class FPAdapter extends FragmentPagerAdapter {
         return mCurrentFragment;
     }
 
-    public Fragment getSelectFragment(int position) {
-        Fragment frg = fragments.get(position);
-        return frg;
+    //以下、Fragmentのメソッド本体へのアクセス部
+    public void setTextOrder(String txt){
+        mCurrentFragment.setTextOrder(txt);
+    }
+
+    public boolean checkHantei(String sWakuAmi){
+        return mCurrentFragment.checkHantei(sWakuAmi);
+    }
+
+    public boolean checkFocused(int i) {
+        return mCurrentFragment.checkFocused(i);
+    }
+
+    public void setKokanInfo(String[] info) {
+        Fragment frg;
+
+        for (int i = 0; i < 2; i++) {
+            frg = fragments.get(i);
+            frg.setKokanInfo(info);
+        }
+    }
+
+    public String createUpdText() {
+        Fragment frg;
+        String txt = "";
+
+        for (int i = 0; i < 2; i++) {
+            //i = 0 : 機械No取得 /i = 1 : 枠網取得
+            frg = fragments.get(i);
+            txt += frg.createUpdText();
+        }
+        return txt;
+    }
+
+    public void initFragmentPage() {
+        Fragment frg;
+
+        for (int i = 0; i < 2; i++) {
+            frg = fragments.get(i);
+            frg.initFragmentPage();
+        }
     }
 }

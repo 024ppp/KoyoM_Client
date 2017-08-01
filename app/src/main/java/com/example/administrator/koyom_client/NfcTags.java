@@ -24,12 +24,12 @@ import java.nio.charset.Charset;
  * @author jumpei
  *
  */
-public class NfcWriter {
+public class NfcTags {
 
     private NfcAdapter nfcAdapter = null;
     private String errorMessage = null;
 
-    public NfcWriter(Context context) {
+    public NfcTags(Context context) {
         // Get default NFC adapter
         this.nfcAdapter = NfcAdapter.getDefaultAdapter(context);
     }

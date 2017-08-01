@@ -1,8 +1,12 @@
 package com.example.administrator.koyom_client;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,8 +14,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import static android.content.ContentValues.TAG;
+
 public class SelectSagyo extends Activity implements View.OnClickListener {
     ListView lv;
+    BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,10 +94,43 @@ public class SelectSagyo extends Activity implements View.OnClickListener {
                 return false;
             }
         });
+
+        //画面On/Off対応
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        // ブロードキャストリスナー
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action != null) {
+                    if (action.equals(Intent.ACTION_SCREEN_ON)) {
+                        // 画面ON時
+                        Log.d(TAG, "SCREEN_ON");
+                    } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+                        // 画面OFF時
+                        setCanceled();
+                    }
+                }
+            }
+        };
+        registerReceiver(broadcastReceiver, filter);
+    }
+
+    private void setCanceled(){
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @Override
+    public void onUserLeaveHint(){
+        //ホームボタンが押された時や、他のアプリが起動した時に呼ばれる
+        //戻るボタンが押された場合には呼ばれない
+        setCanceled();
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){
+            setCanceled();
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -100,6 +140,18 @@ public class SelectSagyo extends Activity implements View.OnClickListener {
     //クリック処理の実装
     public void onClick(View v) {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // 登録したレシーバを解除する
+        unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
 }

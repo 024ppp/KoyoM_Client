@@ -94,8 +94,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                             }
                             break;
                     }
-
-
                     //キーボードをしまう
                     InputMethodManager imm = (InputMethodManager)mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -189,7 +187,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         }
 
         //次の空白のEditTextにフォーカスを移動する
-        //todo 全て埋まった場合の動作を追加(要らない？)
         for (EditText edtNext : editTexts) {
             if (TextUtils.isEmpty(edtNext.getText().toString())) {
                 edtNext.setFocusableInTouchMode(true);
@@ -202,9 +199,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
 
     public boolean checkFocused(int i) {
         EditText editText = editTexts.get(i);
-
-        Boolean result = editText.isFocused();
-        return result;
+        return editText.isFocused();
     }
 
     //TextViewに工程管理番号から取得した情報をセットする
@@ -231,7 +226,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     }
 
     //各EditTextから、更新時に必要な情報を取得する
-    public String getForUpdateText() {
+    public String createUpdText() {
         String txt = "";
 
         switch (mPosition) {
@@ -248,7 +243,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 }
                 break;
         }
-
         return txt;
     }
 
