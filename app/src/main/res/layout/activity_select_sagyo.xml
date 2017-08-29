@@ -4,24 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.administrator.koyoh_client.SelectSagyo">
+    tools:context="com.example.administrator.koyom_client.MainActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:background="@drawable/frame_textview"
-            android:textSize="30sp"
-            android:text="作業者選択" />
-
-        <ListView android:id="@+id/listView1"
+        <ListView android:id="@+id/list"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
+
+        <!--
+        リストが無かった場合に表示される。
+        ちなみに AdapterView#setEmptyView() に指定するのと同じこと。
+        レイアウトが android.R.layout.list_content (カスタムビューじゃない場合)は、
+        ListFragment#setEmptyText() に文言だけ指定すればOK。-->
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -26,12 +26,23 @@ public class ClientThread implements Runnable {
     OutputStream os = null;
     String ip;
     int myPort;
+    BufferedWriter bw;
 
     //コンストラクタ
     public ClientThread(Handler handler, String ip, int myPort) {
         this.handler = handler;
         this.ip = ip;
         this.myPort = myPort;
+    }
+
+    //ファイナライザ
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            super.finalize();
+        } finally {
+            bw.close();
+        }
     }
 
     public void run() {
@@ -42,7 +53,7 @@ public class ClientThread implements Runnable {
             os = s.getOutputStream();
 
             OutputStream out = s.getOutputStream();
-            BufferedWriter bw = new BufferedWriter( new OutputStreamWriter(out, "UTF-8")  );
+            bw = new BufferedWriter( new OutputStreamWriter(out, "UTF-8")  );
             //接続成功時
             bw.write(ProcessCommand.SAG.getString() + "\n");    //作業者検索コマンドを投げる
             //データを確定させて通信処理を起こさせる

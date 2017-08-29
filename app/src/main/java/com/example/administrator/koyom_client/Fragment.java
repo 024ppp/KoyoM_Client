@@ -13,8 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,11 +29,14 @@ import static com.example.administrator.koyom_client.R.layout.toast;
 public class Fragment extends android.support.v4.app.Fragment implements View.OnClickListener, View.OnKeyListener {
     private final static String POSITION = "POSITION";
     private int mPosition;
+    private String m_SagyoName = "";
     private ColorStateList mDefaultColor = null;
-    int[] pages = { R.layout.zenhan, R.layout.kouhan};
+    int[] pages = { R.layout.activity_select_sagyo, R.layout.zenhan, R.layout.kouhan};
     ArrayList<EditText> editTexts = new ArrayList<EditText>();
     ArrayList<TextView> textViews = new ArrayList<TextView>();
     ArrayList<TextView> textViews_Hantei = new ArrayList<TextView>();
+    ListView lv;
+    EditText txtSagyo;
 
     public static Fragment newInstance(int position) {
         Fragment frag = new Fragment();
@@ -50,14 +56,20 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                              Bundle savedInstanceState) {
 
         int position = getArguments().getInt(POSITION);
+        //position保持
+        mPosition = position;
         View view = inflater.inflate(pages[position], null);
 
         //コントロール設定
-        setControls(view, position);
-        //初期化
-        initFragmentPage();
-        //position保持
-        mPosition = position;
+        if (position == 0) {
+            setListView(view);
+        }
+        else {
+            setControls(view, position);
+            //初期化
+            initFragmentPage();
+        }
+
         return view;
     }
 
@@ -74,17 +86,17 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                     MainActivity mainActivity = (MainActivity) getActivity();
                     //ページ分岐
                     switch (mPosition){
-                        case 0:
+                        case 1:
                             switch (v.getId()) {
                                 case R.id.txtKikai:
-                                    pressedEnter(mainActivity, 1);
+                                    pressedEnter(mainActivity, 0);
                                     break;
                                 case R.id.txtKokan:
-                                    pressedEnter(mainActivity, 2);
+                                    pressedEnter(mainActivity, 1);
                                     break;
                             }
                             break;
-                        case 1:
+                        case 2:
                             //枠網の手入力
                             for (int i = 0; i < 7; i++) {
                                 if (checkFocused(i)) {
@@ -122,11 +134,13 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         //フォーカス中のEditTextをクリア
         editText.setText("");
         //ページ分岐
-        if (mPosition == 0) {
-            mainActivity.onEnterPushed(msg, num);
-        }
-        else {
-            mainActivity.onEnterPushed(msg, num + 10);
+        switch (mPosition){
+            case 1:
+                mainActivity.onEnterPushed(msg, num);
+                break;
+            case 2:
+                mainActivity.onEnterPushed(msg, num + 10);
+                break;
         }
     }
 
@@ -202,17 +216,27 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         return editText.isFocused();
     }
 
+    public boolean checkIsEmpty(int i) {
+        if (i < 50) {
+            EditText editText = editTexts.get(i);
+            return TextUtils.isEmpty(editText.getText());
+        }
+        else {
+            return TextUtils.isEmpty((txtSagyo.getText()));
+        }
+    }
+
     //TextViewに工程管理番号から取得した情報をセットする
     public void setKokanInfo(String[] info) {
         TextView textView;
         switch (mPosition) {
-            case 0:
+            case 1:
                 for (int i = 0; i < textViews.size(); i++) {
                     textView = textViews.get(i);
                     textView.setText(info[i + 1]);
                 }
                 break;
-            case 1:
+            case 2:
                 for (int i = 0; i < textViews.size(); i++) {
                     textView = textViews.get(i);
                     textView.setText(info[i + 3]);
@@ -230,14 +254,14 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         String txt = "";
 
         switch (mPosition) {
-            case 0:
-                //mPosition = 0 : 機械No取得
-                EditText editText = editTexts.get(1);
+            case 1:
+                //mPosition = 1 : 機械No取得
+                EditText editText = editTexts.get(0);
                 txt = editText.getText().toString();
                 break;
 
-            case 1:
-                //mPosition = 1 : 枠網取得
+            case 2:
+                //mPosition = 2 : 枠網取得
                 for (EditText editText1 : editTexts) {
                     txt += "," + editText1.getText().toString();
                 }
@@ -246,18 +270,58 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
         return txt;
     }
 
+    //取得した作業者名をListViewにセット
+    public void setListSagyoName(String names) {
+        String[] members = names.split(",");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_expandable_list_item_1, members);
+        lv.setAdapter(adapter);
+        m_SagyoName = names;
+    }
+
+    //選択された作業者名をセット
+    public void setSelectedSagyoName(String name) {
+        if (mPosition == 1) {
+            txtSagyo.setText(name);
+        }
+    }
+
+    //ListViewの設定
+    private void setListView(View view) {
+        lv = (ListView) view.findViewById(R.id.list);
+        //リスト項目がクリックされた時の処理
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ListView listView = (ListView) parent;
+                String item = (String) listView.getItemAtPosition(position);
+                //MainActivity経由で作業者名をセット
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.adaptSelectedSagyoName(item);
+            }
+        });
+        if (!m_SagyoName.equals("")) {
+            setListSagyoName(m_SagyoName);
+        }
+    }
+
     private void setControls(View view, int position){
         int[] txtId = null;
         int[] lblId = null;
         int[] lblId_Hantei = null;
 
         switch(position) {
-            case 0:
-                txtId = new int[] {R.id.txtSagyo, R.id.txtKikai, R.id.txtKokan};
+            case 1:
+                //txtId = new int[] {R.id.txtSagyo, R.id.txtKikai, R.id.txtKokan};
+                txtId = new int[] {R.id.txtKikai, R.id.txtKokan};
                 lblId = new int[] {R.id.lblSyori, R.id.lblSyoriNM};
 
+                //txtSagyoのみ特別扱い
+                txtSagyo = (EditText) view.findViewById(R.id.txtSagyo);
+                txtSagyo.setFocusableInTouchMode(false);
+                txtSagyo.setFocusable(false);
+
                 break;
-            case 1:
+            case 2:
                 txtId = new int[] {R.id.txtWaku1, R.id.txtAmi2, R.id.txtWaku3, R.id.txtAmi4
                                   , R.id.txtWaku5, R.id.txtAmi6, R.id.txtWaku7};
                 lblId = new int[] {R.id.lblSet1, R.id.lblSet2, R.id.lblSet3, R.id.lblSet4
@@ -307,6 +371,14 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     public void initFragmentPage() {
         EditText editText = null;
 
+        switch(mPosition) {
+            case 0:
+                return;
+            case 1:
+                txtSagyo.setText("");
+                break;
+        }
+
         //EditText初期化
         for (int i = 0; i < editTexts.size(); i++) {
             editText = editTexts.get(i);
@@ -328,6 +400,8 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
             }
         }
 
+        //ページ最初のコントロールにフォーカスをあてる
+        editText = editTexts.get(0);
         editText.requestFocus();
 
         //TextView初期化

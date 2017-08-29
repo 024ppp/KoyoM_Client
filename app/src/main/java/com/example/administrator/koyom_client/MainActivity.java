@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,10 +58,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //バイブ
-        vib = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-        // view取得
-        setViews();
         //ハンドラー
         handler = new Handler()
         {
@@ -75,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-
         //接続先を取得
         SharedPreferences prefs = getSharedPreferences("ConnectionData", Context.MODE_PRIVATE);
         final String ip = prefs.getString("ip", "");
@@ -83,10 +79,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clientThread = new ClientThread(handler, ip, myPort);
         // サーバ接続スレッド開始
         new Thread(clientThread).start();
+
+        //バイブ
+        vib = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        // view取得
+        setViews();
+
         //NFCタグ
         this.nfcTags = new NfcTags(this);
         //初期メッセージ
-        show.setText("サーバー通信がありません。");
+        //show.setText("サーバー通信がありません。");
 
         //Fragment切替時の振る舞い（未使用）
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -109,11 +111,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //Fragmentからのエンターキー押下処理。手入力対応
     public void onEnterPushed(String msg, int num) {
         switch (num) {
-            case 1:
+            case 0:
                 //機械No
                 sendMsgToServer(pc.KIK.getString() + msg);
                 break;
-            case 2:
+            case 1:
                 //工程管理番号
                 sendMsgToServer(pc.KOB.getString() + msg);
                 break;
@@ -133,15 +135,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String excmd  = pc.COMMAND_LENGTH.getExcludeCmdText(sMsg);
 
         if (cmd.equals(pc.SAG.getString())) {
-            m_sagyoName = excmd;
-            showSelectSagyo();
+            //作業者名をセット
+            if (!excmd.equals("")) {
+                fpAdapter.setListSagyoName(excmd);
+                setShowMessage(0);
+            }
+            //m_sagyoName = excmd;
+            //showSelectSagyo();
         }
         else if (cmd.equals(pc.KIK.getString())) {
-            //Vコン存在チェック後、検索結果が返ってくる
-            fpAdapter.setTextOrder(excmd);
-            //カメラ起動を有効化
-            btnCam.setEnabled(true);
-            setShowMessage(2);
+            //作業者名が空白かどうかチェック
+            if (fpAdapter.checkIsEmpty(1, 99)) {
+                setShowMessage(0);
+                //バイブ エラー
+                vib.vibrate(m_vibPattern_error, -1);
+            }
+            else {
+                //Vコン存在チェック後、検索結果が返ってくる
+                fpAdapter.setTextOrder(excmd);
+                //カメラ起動を有効化
+                btnCam.setEnabled(true);
+                setShowMessage(2);
+            }
         }
         else if (cmd.equals(pc.KOB.getString())) {
             //工程管理番号の検索結果が返ってくる
@@ -154,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fpAdapter.setKokanInfo(info);
 
                 //ページ遷移
-                viewPager.setCurrentItem(1);
+                viewPager.setCurrentItem(2);
                 //カメラ起動を無効化
                 btnCam.setEnabled(false);
                 //バイブ
@@ -170,9 +185,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             show.setText(excmd);
         }
         else if (cmd.equals(pc.ERR.getString())) {
+            //作業者名が空白かどうかチェック
+            if (fpAdapter.checkIsEmpty(1, 99)) {
+                setShowMessage(0);
+            }
+            else {
+                show.setText(excmd);
+            }
             //バイブ エラー
             vib.vibrate(m_vibPattern_error, -1);
-            show.setText(excmd);
         }
     }
 
@@ -183,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int page = viewPager.getCurrentItem();
 
         if (cmd.equals(pc.KIK.getString())) {
-            if (page == 0) {
-                if (fpAdapter.checkFocused(1)) {
+            if (page == 1) {
+                if (fpAdapter.checkFocused(0)) {
                     //TAGテキストをそのまま送信
                     sendMsgToServer(sMsg);
                 }
@@ -192,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (cmd.equals(pc.WAK.getString()) ||
                   cmd.equals(pc.AMI.getString())) {
-            if (page == 1) {
+            if (page == 2) {
                 if (fpAdapter.checkHantei(excmd)){
                     fpAdapter.setTextOrder(excmd);
                     setShowMessage(4);
@@ -211,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewPager.setCurrentItem(0);
         //登録ボタンを無効化
         btnUpd.setEnabled(false);
-        showSelectSagyo();
+        setShowMessage(0);
     }
 
     @Override
@@ -291,6 +312,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setShowMessage(int order) {
         switch (order) {
+            case 0:
+                show.setText("作業者名を選択してください。");
+                break;
             case 1:
                 show.setText("機械Noをタッチしてください。");
                 break;
@@ -331,11 +355,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case SAGYOSYA:
                 if (resultCode == RESULT_OK) {
                     String value = bundle.getString("key.StringData");
+                    //作業者選択画面での戻りボタン等に対応
+                    if (value.equals("")) {
+                        finishAndRemoveTask();
+                    }
                     fpAdapter.setTextOrder(value);
                     setShowMessage(1);
 
                 } else if (resultCode == RESULT_CANCELED) {
-                    finish();
+                    finishAndRemoveTask();
                 }
                 break;
 
@@ -347,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (resultCode == CommonStatusCodes.SUCCESS) {
                     if (data != null) {
                         Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-                        //画面タップキャンセル対応
+                        //戻るボタン対応
                         if (barcode == null){
                             setShowMessage(2);
                             break;
@@ -355,9 +383,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String value = barcode.displayValue;
                         int page = viewPager.getCurrentItem();
 
-                        //ページ１で、工管Noにフォーカスがある場合のみ、サーバにメッセージ送信
-                        if (page == 0) {
-                            if (fpAdapter.checkFocused(2)) {
+                        //ページ2で、工管Noにフォーカスがある場合のみ、サーバにメッセージ送信
+                        if (page == 1) {
+                            if (fpAdapter.checkFocused(1)) {
                                 String msg = pc.KOB.getString() + value;
                                 sendMsgToServer(msg);
                             }
@@ -385,6 +413,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fpAdapter = new FPAdapter(manager);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(fpAdapter);
+        //3ページ以上になる場合は、フラグメントの再インスタンス化を防ぐため設定
+        viewPager.setOffscreenPageLimit(fpAdapter.getCount() - 1);
 
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
@@ -421,6 +451,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         this.nfcTags = null;
+        try {
+            clientThread.finalize();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            //Dialog(OK,Cancel Ver.)
+            new AlertDialog.Builder(this)
+                    .setTitle("確認")
+                    .setMessage("終了してもよろしいですか？")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // OK button pressed
+                            finishAndRemoveTask();
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -444,19 +499,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(intent, requestCode);
             return true;
         }
+        else if (id == R.id.action_finish) {
+            //Dialog(OK,Cancel Ver.)
+            new AlertDialog.Builder(this)
+                    .setTitle("確認")
+                    .setMessage("終了してもよろしいですか？")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // OK button pressed
+                            finishAndRemoveTask();
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }
         return super.onOptionsItemSelected(item);
     }
 
     //作業者選択画面呼び出し
+    /*
     private void showSelectSagyo() {
         if (m_sagyoName.equals("")) {
             show.setText("作業者名取得エラー。\nアプリを再起動してください。");
+            //アプリを強制終了する
+            finishAndRemoveTask();
             return;
         }
         Intent intent = new Intent(this, SelectSagyo.class);
         intent.putExtra("name", m_sagyoName);
         int requestCode = SAGYOSYA;
         startActivityForResult(intent, requestCode);
+    }
+    */
+    //作業者名をセットするための中継
+    public void adaptSelectedSagyoName(String name) {
+        fpAdapter.setSelectedSagyoName(name);
+        //機械Noが空白かどうかチェック
+        if (fpAdapter.checkIsEmpty(1, 0)) {
+            setShowMessage(1);
+        }
+        //ページ遷移
+        viewPager.setCurrentItem(1);
     }
 
     private PendingIntent createPendingIntent() {

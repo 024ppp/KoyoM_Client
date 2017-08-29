@@ -35,6 +35,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -408,7 +409,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
                 bestDistance = distance;
             }
         }
-        /*
+
         if (best != null) {
             Intent data = new Intent();
             data.putExtra(BarcodeObject, best);
@@ -417,13 +418,22 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
             return true;
         }
         return false;
-        */
-        //画面タップでカメラ画面終了
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            setCanceled();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    //メイン画面に戻る
+    private void setCanceled(){
         Intent data = new Intent();
         data.putExtra(BarcodeObject, "");
         setResult(CommonStatusCodes.SUCCESS, data);
         finish();
-        return true;
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {

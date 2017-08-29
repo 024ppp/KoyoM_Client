@@ -27,12 +27,21 @@ public class FPAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return "ページ" + (position + 1);
+        switch (position) {
+            case 0:
+                return "作業者名";
+            case 1:
+                return "機械,工管No";
+            case 2:
+                return "枠網";
+            default:
+                return "ページ" + (position + 1);
+        }
     }
 
     @Override
@@ -60,10 +69,15 @@ public class FPAdapter extends FragmentPagerAdapter {
         return mCurrentFragment.checkFocused(i);
     }
 
+    public boolean checkIsEmpty(int position, int i) {
+        Fragment frg = fragments.get(position);
+        return frg.checkIsEmpty(i);
+    }
+
     public void setKokanInfo(String[] info) {
         Fragment frg;
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i < 3; i++) {
             frg = fragments.get(i);
             frg.setKokanInfo(info);
         }
@@ -73,7 +87,7 @@ public class FPAdapter extends FragmentPagerAdapter {
         Fragment frg;
         String txt = "";
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i < 3; i++) {
             //i = 0 : 機械No取得 /i = 1 : 枠網取得
             frg = fragments.get(i);
             txt += frg.createUpdText();
@@ -84,9 +98,21 @@ public class FPAdapter extends FragmentPagerAdapter {
     public void initFragmentPage() {
         Fragment frg;
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i < 3; i++) {
             frg = fragments.get(i);
             frg.initFragmentPage();
         }
+    }
+
+    //作業者選択ページのフラグメントの変数に値をセットする
+    public void setListSagyoName(String names) {
+        Fragment frg = fragments.get(0);
+        frg.setListSagyoName(names);
+    }
+
+    //選択された作業者名をセットする
+    public void setSelectedSagyoName(String name) {
+        Fragment frg = fragments.get(1);
+        frg.setSelectedSagyoName(name);
     }
 }

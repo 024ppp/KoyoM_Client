@@ -32,7 +32,7 @@ public class SelectSagyo extends Activity implements View.OnClickListener {
         //String[] members = { names, "相田みつを", "石原さとみ", "宇野けんたろう", "江川卓",
         //        "オリバー・カーン", "河北麻友子", "木村拓哉", "蔵座敷", "県民共済", "コイキング" };
 
-        lv = (ListView) findViewById(R.id.listView1);
+        lv = (ListView) findViewById(R.id.list);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_expandable_list_item_1, members);
@@ -116,8 +116,14 @@ public class SelectSagyo extends Activity implements View.OnClickListener {
         registerReceiver(broadcastReceiver, filter);
     }
 
+    //メイン画面に戻る
     private void setCanceled(){
-        setResult(RESULT_CANCELED);
+        // 返すデータ(Intent&Bundle)の作成
+        Intent data = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putString("key.StringData", "");
+        data.putExtras(bundle);
+        setResult(RESULT_OK, data);
         finish();
     }
 
@@ -125,7 +131,8 @@ public class SelectSagyo extends Activity implements View.OnClickListener {
     public void onUserLeaveHint(){
         //ホームボタンが押された時や、他のアプリが起動した時に呼ばれる
         //戻るボタンが押された場合には呼ばれない
-        setCanceled();
+        //（注）ホームボタン押下時はアプリが終了できないため、無効化
+        //setCanceled();
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
