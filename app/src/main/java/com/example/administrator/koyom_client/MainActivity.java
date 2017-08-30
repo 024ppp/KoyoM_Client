@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //インスタンス化無しで使える
     ProcessCommand pc;
 
-    private String m_sagyoName = "";
     private int m_wakuamiNo;
 
     private static final int SAGYOSYA = 1001;
@@ -140,8 +139,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fpAdapter.setListSagyoName(excmd);
                 setShowMessage(0);
             }
-            //m_sagyoName = excmd;
-            //showSelectSagyo();
         }
         else if (cmd.equals(pc.KIK.getString())) {
             //作業者名が空白かどうかチェック
@@ -228,8 +225,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initPage() {
         //初期化
         fpAdapter.initFragmentPage();
-        //1ページ目に戻る
-        viewPager.setCurrentItem(0);
         //登録ボタンを無効化
         btnUpd.setEnabled(false);
         setShowMessage(0);
@@ -314,6 +309,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (order) {
             case 0:
                 show.setText("作業者名を選択してください。");
+                //1ページ目に戻る
+                viewPager.setCurrentItem(0);
                 break;
             case 1:
                 show.setText("機械Noをタッチしてください。");
@@ -349,24 +346,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle bundle = data.getExtras();
 
         switch (requestCode) {
-            case SAGYOSYA:
-                if (resultCode == RESULT_OK) {
-                    String value = bundle.getString("key.StringData");
-                    //作業者選択画面での戻りボタン等に対応
-                    if (value.equals("")) {
-                        finishAndRemoveTask();
-                    }
-                    fpAdapter.setTextOrder(value);
-                    setShowMessage(1);
-
-                } else if (resultCode == RESULT_CANCELED) {
-                    finishAndRemoveTask();
-                }
-                break;
-
             case SETTING:
                 Toast.makeText(this, "設定が完了しました。", Toast.LENGTH_SHORT).show();
                 break;
@@ -517,21 +498,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    //作業者選択画面呼び出し
-    /*
-    private void showSelectSagyo() {
-        if (m_sagyoName.equals("")) {
-            show.setText("作業者名取得エラー。\nアプリを再起動してください。");
-            //アプリを強制終了する
-            finishAndRemoveTask();
-            return;
-        }
-        Intent intent = new Intent(this, SelectSagyo.class);
-        intent.putExtra("name", m_sagyoName);
-        int requestCode = SAGYOSYA;
-        startActivityForResult(intent, requestCode);
-    }
-    */
     //作業者名をセットするための中継
     public void adaptSelectedSagyoName(String name) {
         fpAdapter.setSelectedSagyoName(name);
