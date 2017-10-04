@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">B棟網目チェック</string>
     <string name="action_settings">設定</string>
+    <string name="action_reconnection">再接続</string>
     <string name="action_finish">終了</string>
     <string name="ip">10.1.1.55</string>
     <integer name="myPort">8888</integer>

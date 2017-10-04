@@ -2,9 +2,11 @@ package com.example.administrator.koyom_client;
 
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView show;
     Button btnClear, btnUpd, btnCam;
     Handler handler;
+    String ip;
+    int myPort;
     // サーバと通信するスレッド
     ClientThread clientThread;
     NfcTags nfcTags = null;
@@ -43,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private int m_wakuamiNo;
 
-    private static final int SAGYOSYA = 1001;
     private static final int SETTING = 8888;
     private static final int RC_BARCODE_CAPTURE = 9001;
 
@@ -51,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Vibrator vib;
     private long m_vibPattern_read[] = {0, 200};
     private long m_vibPattern_error[] = {0, 200, 200, 500};
+
+    // BroadcastReceiver
+    private BroadcastReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         //接続先を取得
         SharedPreferences prefs = getSharedPreferences("ConnectionData", Context.MODE_PRIVATE);
-        final String ip = prefs.getString("ip", "");
-        final int myPort = prefs.getInt("myPort", 0);
-        clientThread = new ClientThread(handler, ip, myPort);
+        ip = prefs.getString("ip", "");
+        myPort = prefs.getInt("myPort", 0);
+        clientThread = new ClientThread(handler, ip, myPort, true);
         // サーバ接続スレッド開始
         new Thread(clientThread).start();
 
@@ -86,9 +92,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //NFCタグ
         this.nfcTags = new NfcTags(this);
-        //初期メッセージ
-        //show.setText("サーバー通信がありません。");
 
+        // 受信する情報の種類を設定
+        // 電源OFF,充電開始の通知を受け取る
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SHUTDOWN);
+        filter.addAction(Intent.ACTION_POWER_CONNECTED);
+
+        // 受信した場合の処理の記述
+        mReceiver = new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context context, Intent intent){
+                //アプリを終了
+                finishAndRemoveTask();
+            }
+        };
+        // BroadcastReceiverを登録する
+        this.registerReceiver(mReceiver, filter);
+
+        /*
         //Fragment切替時の振る舞い（未使用）
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -105,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //show.append("" + position);
             }
         });
+        */
     }
 
     //Fragmentからのエンターキー押下処理。手入力対応
@@ -479,6 +502,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int requestCode = SETTING;
             startActivityForResult(intent, requestCode);
             return true;
+        }
+        else if (id == R.id.action_reconnection) {
+            show.setText("再接続に失敗しました。\n無線LAN状況を確認してください。");
+            //再接続を行う
+            clientThread = new ClientThread(handler, ip, myPort, false);
+            // サーバ接続スレッド開始
+            new Thread(clientThread).start();
         }
         else if (id == R.id.action_finish) {
             //Dialog(OK,Cancel Ver.)

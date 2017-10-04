@@ -82,7 +82,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     //DEBUG
                     Log.d("OnKey", "Enter : " + Integer.toString(v.getId()));
-                    //エラーになるため、エンターの度にGetする
+                    //エンターの度にGetする（クラス変数とし、インスタンス化時にGetしたものを使ってもエラー）
                     MainActivity mainActivity = (MainActivity) getActivity();
                     //ページ分岐
                     switch (mPosition){
