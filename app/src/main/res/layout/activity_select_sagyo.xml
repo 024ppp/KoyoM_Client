@@ -15,18 +15,13 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent" />
 
-        <!--
-        リストが無かった場合に表示される。
-        ちなみに AdapterView#setEmptyView() に指定するのと同じこと。
-        レイアウトが android.R.layout.list_content (カスタムビューじゃない場合)は、
-        ListFragment#setEmptyText() に文言だけ指定すればOK。-->
         <TextView
-            android:id="@android:id/empty"
+            android:id="@+id/emptyTextView"
+            android:text="作業者名取得エラー"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/no_data"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textSize="20sp"
+            android:gravity="center"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -37,6 +37,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     ArrayList<TextView> textViews_Hantei = new ArrayList<TextView>();
     ListView lv;
     EditText txtSagyo;
+    TextView emptyTextView;
 
     public static Fragment newInstance(int position) {
         Fragment frag = new Fragment();
@@ -288,6 +289,9 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     //ListViewの設定
     private void setListView(View view) {
         lv = (ListView) view.findViewById(R.id.list);
+        //ListView で表示リスト項目の無い場合のビューを指定
+        emptyTextView = (TextView) view.findViewById(R.id.emptyTextView);
+        lv.setEmptyView(emptyTextView);
         //リスト項目がクリックされた時の処理
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
