@@ -1,12 +1,12 @@
 package com.example.administrator.koyom_client;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.InputType;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -15,11 +15,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -31,12 +29,13 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
     private int mPosition;
     private String m_SagyoName = "";
     private ColorStateList mDefaultColor = null;
+    private boolean mBarcodeFlg;
     int[] pages = { R.layout.activity_select_sagyo, R.layout.zenhan, R.layout.kouhan};
     ArrayList<EditText> editTexts = new ArrayList<EditText>();
     ArrayList<TextView> textViews = new ArrayList<TextView>();
     ArrayList<TextView> textViews_Hantei = new ArrayList<TextView>();
     ListView lv;
-    EditText txtSagyo;
+    EditText txtSagyo, txtKokan;
     TextView emptyTextView;
 
     public static Fragment newInstance(int position) {
@@ -70,7 +69,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
             //初期化
             initFragmentPage();
         }
-
         return view;
     }
 
@@ -193,6 +191,12 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 break;
             }
         }
+        //バーコードリード時の２重起動を防止
+        if (mPosition == 1) {
+            if (editText.getId() == R.id.txtKokan) {
+                mBarcodeFlg = false;
+            }
+        }
         //テキストをセット
         if (editText != null) {
             editText.setText(txt);
@@ -200,7 +204,6 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
             editText.setFocusableInTouchMode(false);
             editText.setFocusable(false);
         }
-
         //次の空白のEditTextにフォーカスを移動する
         for (EditText edtNext : editTexts) {
             if (TextUtils.isEmpty(edtNext.getText().toString())) {
@@ -324,6 +327,32 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 txtSagyo.setFocusableInTouchMode(false);
                 txtSagyo.setFocusable(false);
 
+                //バーコードリーダー対応
+                txtKokan = (EditText) view.findViewById(R.id.txtKokan);
+                txtKokan.addTextChangedListener(new TextWatcher(){
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count){
+                    }
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        //DEBUG
+                        //Log.d("test", "afterTextChanged");
+                        if (txtKokan.getText().length() >= 6) {
+                            if (mBarcodeFlg) {
+                                //工程管理Noが6文字以上になったら、Enter押下イベントを発生させる
+                                MainActivity mainActivity = (MainActivity) getActivity();
+                                pressedEnter(mainActivity, 1);
+                                //キーボードをしまう
+                                InputMethodManager imm = (InputMethodManager) mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(txtKokan.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                        }
+                    }
+                });
+
                 break;
             case 2:
                 txtId = new int[] {R.id.txtWaku1, R.id.txtAmi2, R.id.txtWaku3, R.id.txtAmi4
@@ -380,6 +409,7 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                 return;
             case 1:
                 txtSagyo.setText("");
+                mBarcodeFlg = true;
                 break;
         }
 

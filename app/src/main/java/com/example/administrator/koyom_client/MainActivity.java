@@ -17,12 +17,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -111,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.registerReceiver(mReceiver, filter);
 
         /*
-        //Fragment切替時の振る舞い（未使用）
+        //Fragment切替時の振る舞い
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             //スクロール状態が変化したときに呼び出される
@@ -124,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             //ページが切り替わった時に呼び出される
             public void onPageSelected(int position) {
-                //show.append("" + position);
             }
         });
         */
