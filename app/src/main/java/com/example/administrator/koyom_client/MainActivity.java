@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //インスタンス化無しで使える
     ProcessCommand pc;
 
-    private int m_wakuamiNo;
+    private int m_wakuamiNo = 1;
 
     private static final int SETTING = 8888;
     private static final int RC_BARCODE_CAPTURE = 9001;
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //枠網
                 if (fpAdapter.checkHantei(msg)){
                     fpAdapter.setTextOrder(msg);
-                    setShowMessage(4);
+                    setShowMessage(3);
                 }
                 break;
         }
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (page == 2) {
                 if (fpAdapter.checkHantei(excmd)){
                     fpAdapter.setTextOrder(excmd);
-                    setShowMessage(4);
+                    setShowMessage(3);
                 }
             }
         }
@@ -345,19 +345,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 show.setText("工管番号をスキャンしてください。");
                 break;
             case 3:
-                show.setText("1枠をタッチしてください。");
-                //次の枠網番号をセット
-                m_wakuamiNo = 2;
-                break;
-            case 4:
-                String wakuamiNo = Integer.toString(m_wakuamiNo);
-
-                if (m_wakuamiNo % 2 == 0) {
-                    show.setText(wakuamiNo + "網をタッチしてください。");
-                }
-                else {
-                    show.setText(wakuamiNo + "枠をタッチしてください。");
-                }
+                show.setText(createWakuAmiMsg());
                 //次の枠網番号をセット
                 m_wakuamiNo++;
 
@@ -367,6 +355,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
         }
+    }
+    private String createWakuAmiMsg() {
+        String msg = "";
+        switch (m_wakuamiNo) {
+            case 1:
+                msg = "枠１をタッチしてください。";
+                break;
+            case 2:
+                msg = "網１をタッチしてください。";
+                break;
+            case 3:
+                msg = "枠２をタッチしてください。";
+                break;
+            case 4:
+                msg = "網２をタッチしてください。";
+                break;
+            case 5:
+                msg = "枠３をタッチしてください。";
+                break;
+            case 6:
+                msg = "網３をタッチしてください。";
+                break;
+            case 7:
+                msg = "枠４をタッチしてください。";
+                break;
+        }
+        return msg;
     }
 
     @Override

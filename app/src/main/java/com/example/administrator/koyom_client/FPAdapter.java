@@ -104,7 +104,7 @@ public class FPAdapter extends FragmentPagerAdapter {
         }
     }
 
-    //作業者選択ページのフラグメントの変数に値をセットする
+    //取得した作業者名をセットする
     public void setListSagyoName(String names) {
         Fragment frg = fragments.get(0);
         frg.setListSagyoName(names);

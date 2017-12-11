@@ -30,13 +30,13 @@
             <TextView
                 android:id="@+id/textView1"
                 style="@style/TextViewStyle_Page2_Title"
-                android:layout_width="126dp"
+                android:layout_width="152dp"
                 android:text="設定" />
 
             <TextView
                 android:id="@+id/textView2"
                 style="@style/TextViewStyle_Page2_Title"
-                android:layout_width="151dp"
+                android:layout_width="124dp"
                 android:text="枠網" />
 
             <TextView
@@ -50,7 +50,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblWaku7"
-                    android:text="７枠"
+                    android:text="⑦枠４"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet7"
@@ -67,7 +67,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblAmi6"
-                    android:text="６網"
+                    android:text="⑥網３"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet6"
@@ -84,7 +84,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblWaku5"
-                    android:text="５枠"
+                    android:text="⑤枠３"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet5"
@@ -101,7 +101,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblAmi4"
-                    android:text="４網"
+                    android:text="④網２"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet4"
@@ -118,7 +118,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblWaku3"
-                    android:text="３枠"
+                    android:text="③枠２"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet3"
@@ -135,7 +135,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblAmi2"
-                    android:text="２網"
+                    android:text="②網１"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet2"
@@ -152,7 +152,7 @@
                 style="@style/LinearLayoutStyle">
                 <TextView
                     android:id="@+id/lblWaku1"
-                    android:text="１枠"
+                    android:text="①枠１"
                     style="@style/TextViewStyle_Page2"/>
                 <TextView
                     android:id="@+id/lblSet1"
