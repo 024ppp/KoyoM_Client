@@ -121,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //念の為に初期値代入
         strKokban = "123456";
         strSagyo = "test";
-
         /*
         //Fragment切替時の振る舞い
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
