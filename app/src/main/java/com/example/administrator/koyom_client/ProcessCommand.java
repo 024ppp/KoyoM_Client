@@ -12,6 +12,7 @@ public enum ProcessCommand {
     WAK("WAK", 1004),
     AMI("AMI", 1005),
     UPD("UPD", 1006),
+    UP2("UP2", 1007),
     REC("REC", 7777),
     MSG("MSG", 8888),
     ERR("ERR", 9999)

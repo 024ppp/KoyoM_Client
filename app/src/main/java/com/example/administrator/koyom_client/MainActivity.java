@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // BroadcastReceiver
     private BroadcastReceiver mReceiver;
 
+    //20200930 MD02K更新追加
+    String strSagyo, strKokban;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +116,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         // BroadcastReceiverを登録する
         this.registerReceiver(mReceiver, filter);
+
+        //20200930 MD02K更新追加
+        //念の為に初期値代入
+        strKokban = "123456";
+        strSagyo = "test";
 
         /*
         //Fragment切替時の振る舞い
@@ -198,12 +206,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //バイブ
                 vib.vibrate(m_vibPattern_read, -1);
                 setShowMessage(3);
+
+                //20200930 MD02K更新追加
+                //工管番号取得
+                strKokban = info[0];
             }
         }
         else if (cmd.equals(pc.UPD.getString())) {
             MyToast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT, 32f).show();
+            //20200930 MD02K更新追加
+            //initPage();
+            String updText = strSagyo + "," + strKokban;
+            sendMsgToServer(pc.UP2.getString() + updText);
+        }
+
+        else if (cmd.equals(pc.UP2.getString())) {
+            MyToast.makeText(this, "登録完了しました。", Toast.LENGTH_SHORT, 32f).show();
             initPage();
         }
+
         else if (cmd.equals(pc.MSG.getString())) {
             show.setText(excmd);
         }
@@ -237,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if (cmd.equals(pc.WAK.getString()) ||
                   cmd.equals(pc.AMI.getString())) {
             if (page == 2) {
+                //ワクアミNoから、メッシュ番号を取得
+                //以下、メッシュ番号を取得後に実施
                 if (fpAdapter.checkHantei(excmd)){
                     fpAdapter.setTextOrder(excmd);
                     setShowMessage(3);
@@ -555,6 +578,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //ページ遷移
         viewPager.setCurrentItem(1);
+
+        //20200930 MD02K更新追加
+        //作業者名を取得
+        strSagyo = name;
     }
 
     private PendingIntent createPendingIntent() {
