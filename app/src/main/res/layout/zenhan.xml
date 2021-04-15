@@ -53,6 +53,7 @@
                     android:id="@+id/lblKokan"
                     android:text="工管No"
                     style="@style/TextViewStyle"/>
+
                 <EditText
                     android:id="@+id/txtKokan"
                     style="@style/EditTextStyle" />

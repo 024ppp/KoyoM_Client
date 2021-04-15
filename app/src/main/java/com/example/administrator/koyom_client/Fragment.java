@@ -340,7 +340,9 @@ public class Fragment extends android.support.v4.app.Fragment implements View.On
                     public void afterTextChanged(Editable s) {
                         //DEBUG
                         //Log.d("test", "afterTextChanged");
-                        if (txtKokan.getText().length() >= 6) {
+                        //20210415 工管番号10桁対応
+                        //if (txtKokan.getText().length() >= 6) {
+                        if (txtKokan.getText().length() >= 10) {
                             if (mBarcodeFlg) {
                                 //工程管理Noが6文字以上になったら、Enter押下イベントを発生させる
                                 MainActivity mainActivity = (MainActivity) getActivity();
